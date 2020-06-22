@@ -1,6 +1,12 @@
 inherit_gem:
   rubocop_defaults: .rubocop.yml
 
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
 Naming/FileName:
  Exclude:
    - lib/rubocop-sidekiq.rb
+
+RSpec/ExampleLength:
+  Max: 10
