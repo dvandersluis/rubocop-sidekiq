@@ -1,5 +1,10 @@
 # This is the default configuration file.
 
+Sidekiq/ConstArgument:
+  Description: "Classes and objects are not valid parameters to a Sidekiq worker"
+  Enabled: true
+  VersionAdded: '0.5'
+
 Sidekiq/DateTimeArgument:
   Description: "Use strings or integers to represent dates/times, not objects"
   Enabled: true

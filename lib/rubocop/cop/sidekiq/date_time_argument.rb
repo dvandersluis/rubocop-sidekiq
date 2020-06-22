@@ -38,20 +38,6 @@ module RuboCop
         def allowed_methods
           Array(cop_config['AllowedMethods']).concat(ALLOWED_METHODS).map(&:to_sym)
         end
-
-        def node_approved?(node)
-          @approved_nodes ||= []
-          @approved_nodes.any? { |r| within?(node.source_range, r) }
-        end
-
-        def approve_node(node)
-          @approved_nodes ||= []
-          @approved_nodes << node.source_range
-        end
-
-        def within?(inner, outer)
-          inner.begin_pos >= outer.begin_pos && inner.end_pos <= outer.end_pos
-        end
       end
     end
   end
