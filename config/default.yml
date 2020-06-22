@@ -1,5 +1,10 @@
 # This is the default configuration file.
 
+Sidekiq/DateTimeArgument:
+  Description: "Use strings or integers to represent dates/times, not objects"
+  Enabled: true
+  VersionAdded: '0.5'
+
 Sidekiq/KeywordArguments:
   Description: "Do not use keyword arguments in a sidekiq worker's perform method"
   Enabled: true
