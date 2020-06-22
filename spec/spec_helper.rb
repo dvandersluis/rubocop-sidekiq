@@ -22,4 +22,15 @@ RSpec.configure do |config|
 
   config.order = :random
   Kernel.srand(config.seed)
+
+  def each_perform_method(&block)
+    %w(perform_async perform_in perform_at).each do |method|
+      context "##{method}" do # rubocop:disable RSpec/EmptyExampleGroup
+        let(:perform) { method }
+        let(:_______) { ' ' * method.length }
+
+        instance_exec(&block)
+      end
+    end
+  end
 end

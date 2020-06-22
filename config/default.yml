@@ -4,3 +4,9 @@ Sidekiq/KeywordArguments:
   Description: "Do not use keyword arguments in a sidekiq worker's perform method"
   Enabled: true
   VersionAdded: '0.5'
+
+Sidekiq/SymbolArgument:
+  Description: 'Use strings instead of symbols as parameters to a worker'
+  Enabled: true
+  VersionAdded: '0.5'
+
