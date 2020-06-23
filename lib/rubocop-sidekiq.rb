@@ -1,5 +1,7 @@
 require 'rubocop'
 
+require_relative 'rubocop/ast/node'
+
 require_relative 'rubocop/sidekiq'
 require_relative 'rubocop/sidekiq/version'
 require_relative 'rubocop/sidekiq/inject'
