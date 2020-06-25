@@ -2,18 +2,27 @@ module RuboCop
   module Cop
     module Sidekiq
       module Helpers
+        SIDEKIQ_INCLUDE_PATTERN = <<~PATTERN.freeze
+          (send nil? :include (const (const nil? :Sidekiq) :Worker))
+        PATTERN
+
+        SIDEKIQ_WORKER_PATTERN = <<~PATTERN.freeze
+          (class _ _
+            {
+              (begin <#sidekiq_include? ...>)
+              #sidekiq_include?
+            }
+          )
+        PATTERN
+
+        SIDEKIQ_PERFORM_PATTERN = <<~PATTERN.freeze
+          (send const {:perform_async :perform_in :perform_at} ...)
+        PATTERN
+
         def self.included(klass)
-          klass.def_node_matcher(:sidekiq_include?, <<~PATTERN)
-            (send nil? :include (const (const nil? :Sidekiq) :Worker))
-          PATTERN
-
-          klass.def_node_matcher(:sidekiq_worker?, <<~PATTERN)
-            (class ... `$#sidekiq_include?)
-          PATTERN
-
-          klass.def_node_matcher(:sidekiq_perform?, <<~PATTERN)
-            (send const {:perform_async :perform_in :perform_at} ...)
-          PATTERN
+          klass.def_node_matcher(:sidekiq_include?, SIDEKIQ_INCLUDE_PATTERN)
+          klass.def_node_matcher(:sidekiq_worker?, SIDEKIQ_WORKER_PATTERN)
+          klass.def_node_matcher(:sidekiq_perform?, SIDEKIQ_PERFORM_PATTERN)
         end
 
         def node_approved?(node)

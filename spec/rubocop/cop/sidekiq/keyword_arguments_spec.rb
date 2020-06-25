@@ -154,4 +154,37 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       RUBY
     end
   end
+
+  context 'in an inner class' do
+    context 'kwarg in inner class' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          class Foo
+            class TestWorker
+              include Sidekiq::Worker
+
+              def perform(foo:)
+                          ^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+              end
+            end
+          end
+        RUBY
+      end
+    end
+
+    context 'kwarg in outer class' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          class Foo
+            class TestWorker
+              include Sidekiq::Worker
+            end
+
+            def perform(foo:)
+            end
+          end
+        RUBY
+      end
+    end
+  end
 end
