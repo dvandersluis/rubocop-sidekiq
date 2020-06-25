@@ -1,7 +1,23 @@
 ---
-sudo: false
+os: linux
 language: ruby
 cache: bundler
+before_install: gem install bundler -v 2.1.4
+install:
+  - bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
+script: bundle exec rspec
 rvm:
-  - 2.6.2
-before_install: gem install bundler -v 2.0.2
+  - 2.7
+  - 2.6
+  - 2.5
+jobs:
+  include:
+    - stage: lint
+      rvm: 2.7
+      gemfile: Gemfile
+      script:
+        - bundle exec rubocop
+    - stage: test
+stages:
+  - test
+  - lint
