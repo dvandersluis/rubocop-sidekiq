@@ -18,13 +18,30 @@ RSpec.describe RuboCop::Cop::Sidekiq::ConstArgument do
                    #{_______} ^^^^^^^^^^ Objects are not Sidekiq-serializable.
         RUBY
       end
+
+      context 'on a namespace' do
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            MyWorker.#{perform}(Foo::Bar.new)
+                     #{_______} ^^^^^^^^^^^^ Objects are not Sidekiq-serializable.
+          RUBY
+        end
+      end
+
+      context 'with a method chain' do
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            MyWorker.#{perform}(Object.new.id)
+          RUBY
+        end
+      end
     end
 
-    context 'with .new and a namespace' do
+    context 'with self' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.#{perform}(Foo::Bar.new)
-                   #{_______} ^^^^^^^^^^^^ Objects are not Sidekiq-serializable.
+          MyWorker.#{perform}(self)
+                   #{_______} ^^^^ Objects are not Sidekiq-serializable.
         RUBY
       end
     end
