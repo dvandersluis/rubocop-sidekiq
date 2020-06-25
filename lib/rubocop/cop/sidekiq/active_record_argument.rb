@@ -99,7 +99,7 @@ module RuboCop
 
           return unless rhs.any? { |x| ar_method_call?(x) }
 
-          values = extract_masgn_values(node).select { |_, val| ar_method_call?(val) }
+          values = extract_masgn_values(*node).select { |_, val| ar_method_call?(val) }
           values.each do |identifier, _|
             add_ar_identifier(identifier)
           end
@@ -177,19 +177,16 @@ module RuboCop
         def extract_var_name(node)
           node = node.to_a.first if node.shorthand_asgn? || node.splat_type?
 
-          if node.casgn_type?
-            _scope, name, * = *node
-          elsif node.optional_arg?
-            name, * = *node
-          elsif node.assignment?
-            name, * = *node
+          name = if node.casgn_type?
+            node.children[1]
+          elsif node.optional_arg? || node.assignment?
+            node.children.first
           end
 
           name
         end
 
-        def extract_masgn_values(node) # rubocop:disable Metrics/MethodLength
-          lhs, rhs = *node
+        def extract_masgn_values(lhs, rhs) # rubocop:disable Metrics/MethodLength
           lhs_values = lhs.to_a
           rhs_values = rhs.array_type? ? rhs.values : [rhs]
 

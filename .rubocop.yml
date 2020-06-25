@@ -1,6 +1,9 @@
 inherit_gem:
   rubocop_defaults: .rubocop.yml
 
+require:
+  - rubocop/cop/internal_affairs
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
