@@ -4,6 +4,8 @@ Sidekiq/ActiveRecordArgument:
   Description: "ActiveRecord arguments are not valid parameters to a Sidekiq worker"
   Enabled: true
   VersionAdded: '0.5'
+  # Look for uses within variables and methods that are passed to perform_*
+  DetectLocalIdentifiers: false
 
 Sidekiq/ConstArgument:
   Description: "Classes and objects are not valid parameters to a Sidekiq worker"

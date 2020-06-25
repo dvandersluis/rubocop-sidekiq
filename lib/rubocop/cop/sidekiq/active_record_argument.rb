@@ -51,6 +51,10 @@ module RuboCop
           }
         PATTERN
 
+        def_node_search :ar_method_calls, <<~PATTERN
+          #ar_method_call?
+        PATTERN
+
         def_node_search :ar_invocations, <<~PATTERN
           {
             #ar_method_call?
@@ -64,7 +68,7 @@ module RuboCop
         def on_send(node)
           return unless sidekiq_perform?(node)
 
-          ar_invocations(node).each do |arg|
+          arguments_of(node).each do |arg|
             next if node_denied?(arg)
 
             if ar?(arg) && chained?(arg, node) && !in_chain_returning_ar?(arg, node)
@@ -78,6 +82,7 @@ module RuboCop
         end
 
         def on_def(node)
+          return unless detect_local_identifiers?
           return unless method_with_internal_ar?(node)
 
           find_method_default_vars(node.arguments)
@@ -87,6 +92,8 @@ module RuboCop
         end
 
         def on_masgn(node)
+          return unless detect_local_identifiers?
+
           rhs = extract_rhs(node)
           rhs = rhs.array_type? ? rhs.values : [rhs]
 
@@ -99,6 +106,7 @@ module RuboCop
         end
 
         def check_assignment(node, rhs)
+          return unless detect_local_identifiers?
           return unless rhs
           return unless ar_method_call?(rhs)
 
@@ -106,6 +114,15 @@ module RuboCop
         end
 
       private
+
+        def detect_local_identifiers?
+          # Should rubocop search for local methods and variables that contain offenses?
+          cop_config['DetectLocalIdentifiers']
+        end
+
+        def arguments_of(node)
+          detect_local_identifiers? ? ar_invocations(node) : ar_method_calls(node)
+        end
 
         def ar_method?(sym)
           ACTIVE_RECORD_METHODS.include?(sym)

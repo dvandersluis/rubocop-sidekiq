@@ -1,5 +1,10 @@
 RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
-  subject(:cop) { described_class.new }
+  let(:cop_config) { {} }
+  let(:config) do
+    RuboCop::Config.new('Sidekiq/ActiveRecordArgument' => cop_config)
+  end
+
+  subject(:cop) { described_class.new(config) }
 
   each_perform_method do
     context 'Model.find' do
@@ -45,9 +50,60 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
         RUBY
       end
     end
+
+    context 'AR as argument' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          def finder(query)
+            query.first
+          end
+
+          MyWorker.#{perform}(finder(Model.all))
+                   #{_______}        ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
+        RUBY
+      end
+    end
+
+    context 'non-AR as argument' do
+      it 'registers an offense' do
+        expect_no_offenses(<<~RUBY)
+          def finder(query)
+            query.first
+          end
+
+          MyWorker.#{perform}(finder(Model.first.id))
+        RUBY
+      end
+    end
+
+    context 'AR as kwarg' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          def finder(query:)
+            query.first
+          end
+
+          MyWorker.#{perform}(finder(query: Model.all))
+                   #{_______}               ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
+        RUBY
+      end
+    end
+
+    context 'non-AR as kwarg' do
+      it 'registers an offense' do
+        expect_no_offenses(<<~RUBY)
+          def finder(id:)
+            id.to_s
+          end
+
+          MyWorker.#{perform}(finder(id: Model.first.id))
+        RUBY
+      end
+    end
   end
 
-  context 'complex cases' do
+  context 'with DetectLocalIdentifiers: true' do
+    let(:cop_config) { { 'DetectLocalIdentifiers' => true } }
     let(:perform) { 'perform_async' }
     let(:_______) { '             ' }
 
@@ -220,56 +276,6 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
         end
       end
 
-      context 'AR as argument' do
-        it 'registers an offense' do
-          expect_offense(<<~RUBY)
-            def finder(query)
-              query.first
-            end
-
-            MyWorker.#{perform}(finder(Model.all))
-                     #{_______}        ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
-          RUBY
-        end
-      end
-
-      context 'non-AR as argument' do
-        it 'registers an offense' do
-          expect_no_offenses(<<~RUBY)
-            def finder(query)
-              query.first
-            end
-
-            MyWorker.#{perform}(finder(Model.first.id))
-          RUBY
-        end
-      end
-
-      context 'AR as kwarg' do
-        it 'registers an offense' do
-          expect_offense(<<~RUBY)
-            def finder(query:)
-              query.first
-            end
-
-            MyWorker.#{perform}(finder(query: Model.all))
-                     #{_______}               ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
-          RUBY
-        end
-      end
-
-      context 'non-AR as kwarg' do
-        it 'registers an offense' do
-          expect_no_offenses(<<~RUBY)
-            def finder(id:)
-              id.to_s
-            end
-
-            MyWorker.#{perform}(finder(id: Model.first.id))
-          RUBY
-        end
-      end
-
       context 'AR as default argument' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
@@ -361,7 +367,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
       end
 
       context 'method chain ending in non-AR method' do
-        it 'registers an offense' do
+        it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
             finder = Model.where(name: 'test')
             MyWorker.#{perform}(finder.id)
@@ -370,7 +376,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
       end
 
       context 'long method chain ending in non-AR method' do
-        it 'registers an offense' do
+        it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
             finder = Model.where(name: 'test')
             MyWorker.#{perform}(finder.first.id)
@@ -479,7 +485,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
       end
 
       context 'balanced, non AR var' do
-        it 'registers an offense' do
+        it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
             foo, bar = Model.last(5), 12
 
