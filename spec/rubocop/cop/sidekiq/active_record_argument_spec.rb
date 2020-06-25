@@ -65,7 +65,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     end
 
     context 'non-AR as argument' do
-      it 'registers an offense' do
+      it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           def finder(query)
             query.first
@@ -90,7 +90,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     end
 
     context 'non-AR as kwarg' do
-      it 'registers an offense' do
+      it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           def finder(id:)
             id.to_s
@@ -238,7 +238,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
       end
 
       context 'multiple return, no AR' do
-        it 'registers an offense' do
+        it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
             def finder
               return :a, :b
