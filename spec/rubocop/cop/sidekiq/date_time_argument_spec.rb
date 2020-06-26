@@ -10,8 +10,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
     context 'Time.now' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.#{perform}(Time.now)
-                   #{_______} ^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
+          MyWorker.perform(Time.now)
+                           ^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
         RUBY
       end
     end
@@ -19,8 +19,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
     context 'DateTime.now' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.#{perform}(DateTime.now)
-                   #{_______} ^^^^^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
+          MyWorker.perform(DateTime.now)
+                           ^^^^^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
         RUBY
       end
     end
@@ -28,14 +28,14 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
     context 'ActiveSupport::TimeWithZone.new' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.#{perform}(ActiveSupport::TimeWithZone.new)
-                   #{_______} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
+          MyWorker.perform(ActiveSupport::TimeWithZone.new)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
         RUBY
       end
 
       it 'can be cast' do
         expect_no_offenses(<<~RUBY)
-          MyWorker.#{perform}(ActiveSupport::TimeWithZone.new.to_i)
+          MyWorker.perform(ActiveSupport::TimeWithZone.new.to_i)
         RUBY
       end
     end
@@ -43,8 +43,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
     context '::ActiveSupport::TimeWithZone.new' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.#{perform}(::ActiveSupport::TimeWithZone.new)
-                   #{_______} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
+          MyWorker.perform(::ActiveSupport::TimeWithZone.new)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.
         RUBY
       end
     end
@@ -52,7 +52,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
     context 'cast to integer' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          MyWorker.#{perform}(Time.now.to_i)
+          MyWorker.perform(Time.now.to_i)
         RUBY
       end
     end
@@ -60,7 +60,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
     context 'cast to string' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          MyWorker.#{perform}(Time.now.to_s)
+          MyWorker.perform(Time.now.to_s)
         RUBY
       end
     end
@@ -70,9 +70,9 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
 
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          MyWorker.#{perform}(Time.foo)
-          MyWorker.#{perform}(Time.bar)
-          MyWorker.#{perform}(Time.now.to_s)
+          MyWorker.perform(Time.foo)
+          MyWorker.perform(Time.bar)
+          MyWorker.perform(Time.now.to_s)
         RUBY
       end
     end
