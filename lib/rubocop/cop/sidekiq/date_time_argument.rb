@@ -14,7 +14,7 @@ module RuboCop
         DURATION_TO_TIME_METHODS = %i(
           from_now since after
           ago until before
-        )
+        ).freeze
 
         include Helpers
         include RationalLiteral

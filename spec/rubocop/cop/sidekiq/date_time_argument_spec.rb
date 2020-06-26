@@ -91,6 +91,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
         RUBY
       end
     end
+
     context 'durations' do
       context 'ActiveSupport::Duration.new' do
         it 'registers an offense' do
