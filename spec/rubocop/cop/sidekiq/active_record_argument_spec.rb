@@ -526,7 +526,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 false
               end
 
-              MyWorker.perform_async(my_method)
+              MyWorker.perform(my_method)
             RUBY
           end
         end
@@ -536,8 +536,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             <<~RUBY
               class Foo
                 def perform
-                  MyWorker.perform_async(my_method)
-                                         ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
+                  MyWorker.perform(my_method)
+                                   ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
                 end
 
               private
@@ -563,7 +563,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
 
               def background
                 not_used = false
-                MyWorker.perform_async(not_used)
+                MyWorker.perform(not_used)
               end
             RUBY
           end
@@ -584,7 +584,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 end
 
                 def perform
-                  MyWorker.perform_async(call)
+                  MyWorker.perform(call)
                 end
               end
             RUBY
@@ -610,7 +610,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 end
 
                 def perform
-                  MyWorker.perform_async(call)
+                  MyWorker.perform(call)
                 end
               end
             RUBY
@@ -632,8 +632,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
 
               class B < A
                 def perform
-                  MyWorker.perform_async(call)
-                                         ^^^^ ActiveRecord objects are not Sidekiq-serializable.
+                  MyWorker.perform(call)
+                                   ^^^^ ActiveRecord objects are not Sidekiq-serializable.
                 end
               end
             RUBY
@@ -643,7 +643,26 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_offense(source)
           end
         end
+
+        context 'nested AR in method' do
+          let(:source) do
+            <<~RUBY
+              def call
+                [Model.first, Model.last]
+              end
+
+              MyWorker.perform(call)
+                               ^^^^ ActiveRecord objects are not Sidekiq-serializable.
+            RUBY
+          end
+
+          it 'registers an offense' do
+            expect_offense(source)
+          end
+        end
       end
     end
+
+    it_behaves_like 'nested unserializable', 'Model.last', 'ActiveRecord objects are not Sidekiq-serializable.'
   end
 end

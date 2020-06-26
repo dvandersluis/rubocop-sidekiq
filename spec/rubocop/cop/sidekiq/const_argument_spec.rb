@@ -78,5 +78,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ConstArgument do
         RUBY
       end
     end
+
+    it_behaves_like 'nested unserializable', 'Object.new', 'Objects are not Sidekiq-serializable.'
   end
 end

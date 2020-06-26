@@ -161,5 +161,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
         RUBY
       end
     end
+
+    it_behaves_like 'nested unserializable', 'Time.now', 'Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.'
   end
 end

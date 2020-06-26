@@ -20,7 +20,7 @@ RSpec.shared_context('rewrite_performs') do |method|
     end
 
     source.gsub!(/(?<=\s)\^/, "#{(' ' * size_difference)}^") if rewrite_annotations
-    source.gsub!(/(?<=\.)#{EachPerformMethod::PERFORM_METHOD}(?=\()/, method.to_s)
+    source.gsub!(/(?<=\.)#{EachPerformMethod::PERFORM_METHOD}(?=\()/, method.to_s) || source
   end
   private :rewrite_performs # rubocop:disable Style/AccessModifierDeclarations
 end

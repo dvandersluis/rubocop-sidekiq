@@ -14,5 +14,10 @@ RSpec.describe RuboCop::Cop::Sidekiq::SymbolArgument do
         RUBY
       end
     end
+
+    it_behaves_like 'nested unserializable',
+      ':symbol',
+      'Symbols are not Sidekiq-serializable; use strings instead.',
+      correction: "'symbol'"
   end
 end

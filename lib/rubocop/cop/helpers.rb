@@ -29,7 +29,17 @@ module RuboCop
           return [] unless node.send_type? && (method_name = sidekiq_perform?(node))
 
           # Drop the first argument for perform_at and perform_in
-          method_name == :perform_async ? node.arguments : node.arguments[1..-1]
+          expand_arguments(method_name == :perform_async ? node.arguments : node.arguments[1..-1])
+        end
+
+        def expand_arguments(arguments)
+          arguments.flat_map do |argument|
+            if argument.array_type? || argument.hash_type?
+              expand_arguments(argument.values)
+            else
+              argument
+            end
+          end
         end
 
         def node_approved?(node)
