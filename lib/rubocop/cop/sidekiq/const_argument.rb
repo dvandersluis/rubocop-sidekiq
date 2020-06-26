@@ -21,9 +21,7 @@ module RuboCop
         PATTERN
 
         def on_send(node)
-          return unless sidekiq_perform?(node)
-
-          node.arguments.each do |arg|
+          sidekiq_arguments(node).each do |arg|
             next unless const_argument?(arg)
             next if non_class_constant?(arg)
 

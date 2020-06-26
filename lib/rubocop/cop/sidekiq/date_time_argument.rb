@@ -2,12 +2,35 @@ module RuboCop
   module Cop
     module Sidekiq
       class DateTimeArgument < ::RuboCop::Cop::Cop
-        include Helpers
+        DURATION_METHODS = %i(
+          second seconds
+          minute minutes
+          hour hours
+          day days
+          week weeks
+          fortnight fortnights
+        ).freeze
 
+        DURATION_TO_TIME_METHODS = %i(
+          from_now since after
+          ago until before
+        )
+
+        include Helpers
+        include RationalLiteral
+
+        DURATION_MSG = 'Durations are not Sidekiq-serializable; use the integer instead.'.freeze
         MSG = 'Date/Time objects are not Sidekiq-serializable; convert to integers or strings instead.'.freeze
         ALLOWED_METHODS = %i(to_i to_s).freeze
 
-        def_node_search :date_time_args, <<~PATTERN
+        def_node_matcher :duration?, <<~PATTERN
+          {
+            (send {int float rational #rational_literal?} #duration_method?)
+            (send (const (const _ :ActiveSupport) :Duration) ...)
+          }
+        PATTERN
+
+        def_node_matcher :date_time_send?, <<~PATTERN
           $(send
             `{
               (const _ {:Date :DateTime :Time})
@@ -17,11 +40,13 @@ module RuboCop
           )
         PATTERN
 
-        def on_send(node)
-          return unless sidekiq_perform?(node)
-          return if node.arguments.none?
+        def_node_matcher :date_time_arg?, <<~PATTERN
+          { #duration? #date_time_send? (send `#duration? #duration_to_time_method?) }
+        PATTERN
 
-          date_time_args(node).each do |arg|
+        def on_send(node)
+          sidekiq_arguments(node).each do |arg|
+            next unless date_time_arg?(arg)
             next if node_approved?(arg)
 
             # If the outer send (ie. the last method in the chain) is in the allowed method
@@ -37,6 +62,19 @@ module RuboCop
 
         def allowed_methods
           Array(cop_config['AllowedMethods']).concat(ALLOWED_METHODS).map(&:to_sym)
+        end
+
+        def duration_method?(sym)
+          DURATION_METHODS.include?(sym)
+        end
+
+        def duration_to_time_method?(sym)
+          DURATION_TO_TIME_METHODS.include?(sym)
+        end
+
+        def message(node)
+          return DURATION_MSG if duration?(node)
+          super
         end
       end
     end

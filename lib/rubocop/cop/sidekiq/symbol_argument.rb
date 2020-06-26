@@ -7,9 +7,7 @@ module RuboCop
         MSG = 'Symbols are not Sidekiq-serializable; use strings instead.'.freeze
 
         def on_send(node)
-          return unless sidekiq_perform?(node)
-
-          node.arguments.each do |argument|
+          sidekiq_arguments(node).each do |argument|
             add_offense(argument) if argument.sym_type?
           end
         end

@@ -16,13 +16,20 @@ module RuboCop
         PATTERN
 
         SIDEKIQ_PERFORM_PATTERN = <<~PATTERN.freeze
-          (send const {:perform_async :perform_in :perform_at} ...)
+          (send const ${:perform_async :perform_in :perform_at} ...)
         PATTERN
 
         def self.included(klass)
           klass.def_node_matcher(:sidekiq_include?, SIDEKIQ_INCLUDE_PATTERN)
           klass.def_node_matcher(:sidekiq_worker?, SIDEKIQ_WORKER_PATTERN)
           klass.def_node_matcher(:sidekiq_perform?, SIDEKIQ_PERFORM_PATTERN)
+        end
+
+        def sidekiq_arguments(node)
+          return [] unless (method_name = sidekiq_perform?(node))
+
+          # Drop the first argument for perform_at and perform_in
+          method_name == :perform_async ? node.arguments : node.arguments[1..-1]
         end
 
         def node_approved?(node)
