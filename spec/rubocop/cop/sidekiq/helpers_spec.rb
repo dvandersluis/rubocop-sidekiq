@@ -63,5 +63,17 @@ RSpec.describe RuboCop::Cop::Sidekiq::Helpers do
 
       it { is_expected.to be_nil }
     end
+
+    context 'anonymous class' do
+      let(:source) do
+        <<~RUBY
+          Class.new do
+            include Sidekiq::Worker
+          end
+        RUBY
+      end
+
+      it { is_expected.to be(true) }
+    end
   end
 end

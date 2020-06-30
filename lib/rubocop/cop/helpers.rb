@@ -7,13 +7,23 @@ module RuboCop
             (send nil? :include (const (const nil? :Sidekiq) :Worker))
           PATTERN
 
+          def_node_matcher :includes_sidekiq?, <<~PATTERN
+            {
+              (begin <#sidekiq_include? ...>)
+              #sidekiq_include?
+            }
+          PATTERN
+
+          def_node_matcher :worker_class_def?, <<~PATTERN
+            (class _ _ #includes_sidekiq?)
+          PATTERN
+
+          def_node_matcher :worker_anon_class_def?, <<~PATTERN
+            (block (send (const nil? :Class) :new ...) _ #includes_sidekiq?)
+          PATTERN
+
           def_node_matcher :sidekiq_worker?, <<~PATTERN
-            (class _ _
-              {
-                (begin <#sidekiq_include? ...>)
-                #sidekiq_include?
-              }
-            )
+            {#worker_class_def? #worker_anon_class_def?}
           PATTERN
 
           def_node_matcher :sidekiq_perform?, <<~PATTERN

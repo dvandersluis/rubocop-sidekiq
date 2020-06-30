@@ -13,14 +13,18 @@ module RuboCop
 
         def on_def(node)
           return unless perform_with_kwargs?(node)
-
-          klass = node.each_ancestor(:class).first
-          return unless sidekiq_worker?(klass)
+          return unless sidekiq_worker?(find_class(node))
 
           node.arguments.each do |arg|
             next unless KWARG_TYPES.include?(arg.type)
             add_offense(arg)
           end
+        end
+
+      private
+
+        def find_class(node)
+          node.each_ancestor(:class, :block).detect { |anc| sidekiq_worker?(anc) }
         end
       end
     end

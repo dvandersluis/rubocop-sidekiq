@@ -187,4 +187,31 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       end
     end
   end
+
+  context 'in a Class.new class' do
+    context 'that is a sidekiq worker' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          Class.new do
+            include Sidekiq::Worker
+
+            def perform(**kwargs)
+                        ^^^^^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+            end
+          end
+        RUBY
+      end
+    end
+
+    context 'that is not a sidekiq worker' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          Class.new do
+            def perform(**kwargs)
+            end
+          end
+        RUBY
+      end
+    end
+  end
 end
