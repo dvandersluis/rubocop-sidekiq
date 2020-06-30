@@ -391,6 +391,17 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                              ^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
+
+        context 'with instance_variable_set' do
+          it 'registers an offense' do
+            expect_offense(<<~RUBY)
+              instance_variable_set(:@finder, Model.last(5))
+
+              MyWorker.perform(@finder)
+                               ^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
+            RUBY
+          end
+        end
       end
 
       context 'cvar' do
@@ -401,6 +412,17 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             MyWorker.perform(@@finder)
                              ^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
+        end
+
+        context 'with class_variable_set' do
+          it 'registers an offense' do
+            expect_offense(<<~RUBY)
+              class_variable_set(:@@finder, Model.last(5))
+
+              MyWorker.perform(@@finder)
+                               ^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
+            RUBY
+          end
         end
       end
 

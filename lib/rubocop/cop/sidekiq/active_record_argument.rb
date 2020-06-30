@@ -36,6 +36,13 @@ module RuboCop
           ({ivar lvar cvar gvar} #ar_identifier?)
         PATTERN
 
+        def_node_matcher :metaprogrammed_var?, <<~PATTERN
+          (send _ {:instance_variable_set :class_variable_set}
+            $({sym str} _)
+            #ar_method_call?
+          )
+        PATTERN
+
         def_node_matcher :ar?, <<~PATTERN
           {#ar_method_call? #ar_var?}
         PATTERN
@@ -66,19 +73,10 @@ module RuboCop
         PATTERN
 
         def on_send(node)
+          return if track_metaprogramming_var(metaprogrammed_var?(node))
           return unless sidekiq_perform?(node)
 
-          arguments_of(node).each do |arg|
-            next if node_denied?(arg)
-
-            if ar?(arg) && chained?(arg, node) && !in_chain_returning_ar?(arg, node)
-              approve_node(arg)
-              next
-            end
-
-            add_offense(arg)
-            deny_node(arg)
-          end
+          process_arguments(node)
         end
 
         def on_def(node)
@@ -122,6 +120,20 @@ module RuboCop
 
         def arguments_of(node)
           detect_local_identifiers? ? ar_invocations(node) : ar_method_calls(node)
+        end
+
+        def process_arguments(node)
+          arguments_of(node).each do |arg|
+            next if node_denied?(arg)
+
+            if ar?(arg) && chained?(arg, node) && !in_chain_returning_ar?(arg, node)
+              approve_node(arg)
+              next
+            end
+
+            add_offense(arg)
+            deny_node(arg)
+          end
         end
 
         def ar_method?(sym)
@@ -213,6 +225,11 @@ module RuboCop
           method.each_descendant(*RuboCop::AST::Node::ASSIGNMENTS) do |node|
             check_assignment(node, extract_rhs(node))
           end
+        end
+
+        def track_metaprogramming_var(var)
+          return false unless var
+          add_ar_identifier(var.value.to_sym)
         end
       end
     end
