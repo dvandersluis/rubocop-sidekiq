@@ -538,7 +538,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
 
       context 'weird shit', :skip do
         context 'lvar reassignment' do
-          it 'does not register an exception' do
+          it 'does not register an offense' do
             expect_no_offenses(<<~RUBY)
               def my_method(arg = true)
                 foo = false
@@ -571,13 +571,13 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             RUBY
           end
 
-          it 'registers an exception' do
+          it 'registers an offense' do
             expect_offense(source)
           end
         end
 
         context 'reused identifiers' do
-          it 'does not register an exception' do
+          it 'does not register an offense' do
             expect_no_offenses(<<~RUBY)
               def not_used
                 Model.all

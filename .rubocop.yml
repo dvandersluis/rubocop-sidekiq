@@ -3,6 +3,16 @@ inherit_gem:
 
 require:
   - rubocop/cop/internal_affairs
+  - ./lib/rubocop/cop/internal_affairs/incorrect_example_description
+
+InternalAffairs/IncorrectExampleDescription:
+  Include:
+    - spec/**/*.rb
+  Strict: false
+  PositiveDescriptions:
+    - registers an offense
+    - registers an offense and corrects
+    - registers multiple offenses
 
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation

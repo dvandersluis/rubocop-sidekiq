@@ -51,7 +51,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
         RUBY
       end
 
-      it 'can be cast' do
+      it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           MyWorker.perform(ActiveSupport::TimeWithZone.new.to_i)
         RUBY
