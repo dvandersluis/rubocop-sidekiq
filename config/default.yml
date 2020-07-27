@@ -37,6 +37,11 @@ Sidekiq/NamedQueue:
     - low
     - critical
 
+Sidekiq/Sleep:
+  Description: "Do not call sleep in a sidekiq worker, queue up a job for later instead"
+  Enabled: true
+  VersionAdded: '0.5'
+
 Sidekiq/SymbolArgument:
   Description: 'Use strings instead of symbols as parameters to a worker'
   Enabled: true
