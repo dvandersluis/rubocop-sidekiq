@@ -17,6 +17,11 @@ Sidekiq/DateTimeArgument:
   Enabled: true
   VersionAdded: '0.5'
 
+Sidekiq/IncludedInModule:
+  Description: "Only include Sidekiq::Worker in classes"
+  Enabled: true
+  VersionAdded: '0.5'
+
 Sidekiq/KeywordArguments:
   Description: "Do not use keyword arguments in a sidekiq worker's perform method"
   Enabled: true
