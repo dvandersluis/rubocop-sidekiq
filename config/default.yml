@@ -27,6 +27,16 @@ Sidekiq/KeywordArguments:
   Enabled: true
   VersionAdded: '0.5'
 
+Sidekiq/NamedQueue:
+  Description: "Minimize the number of queues used for sidekiq"
+  StyleGuide: "https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues"
+  Enabled: true
+  VersionAdded: '0.5'
+  AllowedNames:
+    - default
+    - low
+    - critical
+
 Sidekiq/SymbolArgument:
   Description: 'Use strings instead of symbols as parameters to a worker'
   Enabled: true
