@@ -76,4 +76,90 @@ RSpec.describe RuboCop::Cop::Sidekiq::Helpers do
       it { is_expected.to be(true) }
     end
   end
+
+  describe '#in_sidekiq_worker?' do
+    let(:ast) { parse_source(source).ast }
+    let(:node) { ast.each_descendant(:def).first }
+
+    subject { cop.in_sidekiq_worker?(node) }
+
+    context 'node is inside a class worker' do
+      let(:source) do
+        <<~RUBY
+          class MyWorker
+            include Sidekiq::Worker
+
+            def perform
+            end
+          end
+        RUBY
+      end
+
+      it 'returns the full worker node' do
+        expect(subject).to eq(ast)
+      end
+    end
+
+    context 'node is inside an anonymous worker' do
+      let(:source) do
+        <<~RUBY
+          Class.new do
+            include Sidekiq::Worker
+
+            def perform
+            end
+          end
+        RUBY
+      end
+
+      it 'returns the full worker node' do
+        expect(subject).to eq(ast)
+      end
+    end
+
+    context 'node is inside a class that is not a worker' do
+      let(:source) do
+        <<~RUBY
+          class Foo
+            def perform
+            end
+          end
+        RUBY
+      end
+
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'node is inside an anonymous non-worker' do
+      let(:source) do
+        <<~RUBY
+          Class.new do
+            def perform
+            end
+          end
+        RUBY
+      end
+
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'node is inside another scope' do
+      let(:source) do
+        <<~RUBY
+          module Foo
+            def perform
+            end
+          end
+        RUBY
+      end
+
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+  end
 end

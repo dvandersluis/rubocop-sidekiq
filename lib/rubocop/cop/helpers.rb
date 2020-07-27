@@ -35,6 +35,10 @@ module RuboCop
           klass.class_exec(&NODE_MATCHERS)
         end
 
+        def in_sidekiq_worker?(node)
+          node.each_ancestor(:class, :block).detect { |anc| sidekiq_worker?(anc) }
+        end
+
         def sidekiq_arguments(node)
           return [] unless node.send_type? && (method_name = sidekiq_perform?(node))
 
