@@ -7,12 +7,12 @@ RSpec.describe RuboCop::Cop::Sidekiq::Sleep do
         <<~RUBY
           class MyWorker
             include Sidekiq::Worker
-  
+
             def wait
               sleep 5
               ^^^^^^^ Do not call `sleep` inside a sidekiq worker, schedule a job instead.
             end
-  
+
             def perform
               wait
             end
@@ -30,12 +30,12 @@ RSpec.describe RuboCop::Cop::Sidekiq::Sleep do
         <<~RUBY
           class MyWorker
             include Sidekiq::Worker
-  
+
             def wait
               Kernel.sleep 5
               ^^^^^^^^^^^^^^ Do not call `sleep` inside a sidekiq worker, schedule a job instead.
             end
-  
+
             def perform
               wait
             end

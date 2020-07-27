@@ -7,10 +7,10 @@ module EachPerformMethod
     perform_at: '1.minute.from_now'
   }.freeze
 
-  def each_perform_method(methods: METHODS, &block)
+  def each_perform_method(methods: METHODS, rewrite_mode: :push, &block)
     methods.each do |method|
       context "##{method}" do
-        include_context 'rewrite_performs', method
+        include_context 'rewrite_performs', method, rewrite_mode
         instance_exec(&block)
       end
     end
