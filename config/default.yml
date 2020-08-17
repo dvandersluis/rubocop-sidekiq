@@ -25,6 +25,14 @@ Sidekiq/IncludedInModule:
   Enabled: true
   VersionAdded: '0.5'
 
+Sidekiq/InlinePerform:
+  Description: "Do not instantiate and perform Sidekiq workers directly"
+  Enabled: true
+  VersionAdded: '0.5'
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+
 Sidekiq/KeywordArguments:
   Description: "Do not use keyword arguments in a sidekiq worker's perform method"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
