@@ -7,6 +7,7 @@ module RuboCop
         include Helpers
 
         MSG = 'Objects are not Sidekiq-serializable.'.freeze
+        MSG_SELF = '`self` is not Sidekiq-serializable.'.freeze
 
         def_node_matcher :initializer?, <<~PATTERN
           (send const :new)
@@ -25,14 +26,14 @@ module RuboCop
             next unless const_argument?(arg)
             next if non_class_constant?(arg)
 
-            add_offense(arg)
+            add_offense(arg, message: arg.self_type? ? MSG_SELF : MSG)
           end
         end
 
       private
 
         def non_class_constant?(arg)
-          arg.const_type? && arg.source =~ CONSTANT_NAME
+          arg.const_type? && arg.children[1].to_s =~ CONSTANT_NAME
         end
       end
     end

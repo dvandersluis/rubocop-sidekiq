@@ -41,7 +41,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ConstArgument do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           MyWorker.perform(self)
-                           ^^^^ Objects are not Sidekiq-serializable.
+                           ^^^^ `self` is not Sidekiq-serializable.
         RUBY
       end
     end
@@ -51,6 +51,15 @@ RSpec.describe RuboCop::Cop::Sidekiq::ConstArgument do
         expect_offense(<<~RUBY)
           MyWorker.perform(MyWorker)
                            ^^^^^^^^ Objects are not Sidekiq-serializable.
+        RUBY
+      end
+    end
+
+    context 'namespaced class' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          MyWorker.perform(Namespace::Class)
+                           ^^^^^^^^^^^^^^^^ Objects are not Sidekiq-serializable.
         RUBY
       end
     end
@@ -75,6 +84,14 @@ RSpec.describe RuboCop::Cop::Sidekiq::ConstArgument do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           MyWorker.perform(Foo::Bar.baz)
+        RUBY
+      end
+    end
+
+    context 'with a namespaced constant' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          MyWorker.perform(MyClass::MY_CONSTANT)
         RUBY
       end
     end
