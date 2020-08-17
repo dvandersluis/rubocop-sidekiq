@@ -3,6 +3,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'rubocop/sidekiq/version'
 
 Gem::Specification.new do |spec|
+  spec.required_ruby_version = '>= 2.5'
+
   spec.name          = 'rubocop-sidekiq'
   spec.version       = RuboCop::Sidekiq::VERSION
   spec.authors       = ['Daniel Vandersluis']
@@ -30,5 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
 
-  spec.add_runtime_dependency 'rubocop', '0.80.1'
+  spec.add_runtime_dependency 'rubocop', '>= 0.80'
 end

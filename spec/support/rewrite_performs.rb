@@ -42,5 +42,5 @@ RSpec.shared_context('rewrite_performs') do |method, rewrite_mode = :push|
     source = rewrite_annotations(method, source, rewrite_mode) if annotations
     source.gsub!(/(?<=\.)#{EachPerformMethod::PERFORM_METHOD}(?=\(|\b)/, method.to_s) || source
   end
-  private :rewrite_performs # rubocop:disable Style/AccessModifierDeclarations
+  private :rewrite_performs
 end

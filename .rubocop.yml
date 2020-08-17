@@ -5,6 +5,9 @@ require:
   - rubocop/cop/internal_affairs
   - ./lib/rubocop/cop/internal_affairs/incorrect_example_description
 
+AllCops:
+  NewCops: enable
+
 InternalAffairs/IncorrectExampleDescription:
   Include:
     - spec/**/*.rb
@@ -26,6 +29,9 @@ Naming/FileName:
 
 RSpec/ExampleLength:
   Max: 10
+
+Style/CaseLikeIf:
+  Enabled: false
 
 Style/HashEachMethods:
   Enabled: true

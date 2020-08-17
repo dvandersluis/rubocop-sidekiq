@@ -159,8 +159,10 @@ module RuboCop
 
         def chained?(node, parent)
           node.each_ancestor(:send) do |ancestor|
-            return ancestor != parent
+            return true if ancestor != parent
           end
+
+          false
         end
 
         def in_chain_returning_ar?(node, parent)
@@ -189,13 +191,11 @@ module RuboCop
         def extract_var_name(node)
           node = node.to_a.first if node.shorthand_asgn? || node.splat_type?
 
-          name = if node.casgn_type?
+          if node.casgn_type?
             node.children[1]
           elsif node.optional_arg? || node.assignment?
             node.children.first
           end
-
-          name
         end
 
         def extract_masgn_values(lhs, rhs) # rubocop:disable Metrics/MethodLength
