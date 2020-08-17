@@ -1,0 +1,16 @@
+// START_COP_LIST
+
+=== Department xref:cops_sidekiq.adoc[Sidekiq]
+
+* xref:cops_sidekiq.adoc#sidekiqactiverecordargument[Sidekiq/ActiveRecordArgument]
+* xref:cops_sidekiq.adoc#sidekiqconstargument[Sidekiq/ConstArgument]
+* xref:cops_sidekiq.adoc#sidekiqdatetimeargument[Sidekiq/DateTimeArgument]
+* xref:cops_sidekiq.adoc#sidekiqincludedinmodule[Sidekiq/IncludedInModule]
+* xref:cops_sidekiq.adoc#sidekiqinlineperform[Sidekiq/InlinePerform]
+* xref:cops_sidekiq.adoc#sidekiqkeywordarguments[Sidekiq/KeywordArguments]
+* xref:cops_sidekiq.adoc#sidekiqnamedqueue[Sidekiq/NamedQueue]
+* xref:cops_sidekiq.adoc#sidekiqqueueintransaction[Sidekiq/QueueInTransaction]
+* xref:cops_sidekiq.adoc#sidekiqsleep[Sidekiq/Sleep]
+* xref:cops_sidekiq.adoc#sidekiqsymbolargument[Sidekiq/SymbolArgument]
+
+// END_COP_LIST

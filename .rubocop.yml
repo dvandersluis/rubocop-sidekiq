@@ -23,6 +23,10 @@ Layout/ArgumentAlignment:
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
+Metrics/ClassLength:
+  Exclude:
+  - lib/rubocop/cop/sidekiq/active_record_argument.rb
+
 Naming/FileName:
  Exclude:
    - lib/rubocop-sidekiq.rb

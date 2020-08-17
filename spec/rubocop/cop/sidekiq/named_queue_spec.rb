@@ -52,7 +52,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
             include Sidekiq::Worker
 
             sidekiq_options queue: :foobar
-                                   ^^^^^^^ Do not add new queues to sidekiq.
+                                   ^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
           end
         RUBY
       end
@@ -64,7 +64,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
               include Sidekiq::Worker
 
               sidekiq_options queue: 'foobar'
-                                     ^^^^^^^^ Do not add new queues to sidekiq.
+                                     ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
             end
           RUBY
         end
@@ -77,7 +77,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
               include Sidekiq::Worker
 
               sidekiq_options 'queue' => :foobar
-                                         ^^^^^^^ Do not add new queues to sidekiq.
+                                         ^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
             end
           RUBY
         end
@@ -90,7 +90,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
               include Sidekiq::Worker
 
               sidekiq_options 'queue' => 'foobar'
-                                         ^^^^^^^^ Do not add new queues to sidekiq.
+                                         ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
             end
           RUBY
         end
@@ -103,7 +103,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
               include Sidekiq::Worker
 
               sidekiq_options queue: 'foobar', other: true
-                                     ^^^^^^^^ Do not add new queues to sidekiq.
+                                     ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
             end
           RUBY
         end
@@ -116,7 +116,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
               include Sidekiq::Worker
 
               sidekiq_options other: true, queue: 'foobar'
-                                                  ^^^^^^^^ Do not add new queues to sidekiq.
+                                                  ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
             end
           RUBY
         end
@@ -134,7 +134,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
             include Sidekiq::Worker
 
             sidekiq_options queue: :default
-                                   ^^^^^^^^ Do not add new queues to sidekiq.
+                                   ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: low.
           end
         RUBY
       end

@@ -1,0 +1,503 @@
+= Sidekiq
+
+== Sidekiq/ActiveRecordArgument
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for ActiveRecord objects being passed as arguments to perform a Sidekiq
+worker. ActiveRecord objects cannot be properly serialized into Redis, and therefore
+should not be used. Instead of passing in an instantiated ActiveRecord object, pass
+an ID and instantiate the AR object in the worker.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+MyWorker.perform_async(Post.find(5))
+MyWorker.perform_async(Post.last(3))
+
+# good
+MyWorker.perform_async(5)
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| DetectLocalIdentifiers
+| `false`
+| Boolean
+
+| Severity
+| `warning`
+| String
+|===
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+
+== Sidekiq/ConstArgument
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for Sidekiq worker perform arguments that look like classes or modules.
+These cannot be serialized for Redis, and should not be used with Sidekiq.
+
+Constants other than classes/modules are not flagged by this cop.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+MyWorker.perform_async(MyClass)
+MyWorker.perform_async(MyModule)
+MyWorker.perform_async(Namespace::Class)
+
+# good
+MyWorker.perform_async(MY_CONSTANT)
+MyWorker.perform_async(MyClass::MY_CONSTANT)
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| Severity
+| `warning`
+| String
+|===
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+
+== Sidekiq/DateTimeArgument
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for date/time objects being passed as arguments to perform a Sidekiq
+worker. Dates, times, durations, and related classes cannot be serialized to Redis.
+Use an integer or string representation of the date/time instead.
+
+By default, this only allows `to_i` and `to_s` as valid, serializable methods for these
+classes. Use `AllowedMethods` to specify other allowed methods.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+MyWorker.perform_async(Time.now)
+MyWorker.perform_async(Date.today)
+MyWorker.perform_async(DateTime.now)
+MyWorker.perform_async(ActiveSupport::TimeWithZone.new)
+MyWorker.perform_async(1.hour)
+MyWorker.perform_async(1.hour.ago)
+
+# good
+MyWorker.perform_async(Time.now.to_i)
+MyWorker.perform_async(Date.today.to_s)
+----
+
+==== AllowedMethods: [] (default)
+
+[source,ruby]
+----
+# bad
+MyWorker.perform_async(Time.now.mday)
+----
+
+==== AllowedMethods: ['mday']
+
+[source,ruby]
+----
+# good
+MyWorker.perform_async(Time.now.mday)
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| Severity
+| `warning`
+| String
+
+| AllowedMethods
+| `[]`
+| Array
+|===
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+
+== Sidekiq/IncludedInModule
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for `include Sidekiq::Worker` in a module. Modules are not instantiable,
+which means that if a module is attempted to be queued, Sidekiq will error trying to
+run the job.
+
+Modules intended for use with Sidekiq worker inheritance can be allowed by adding
+it to the Whitelist.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+module MyWorker
+  include Sidekiq::Worker
+end
+
+# good
+class MyWorker
+  include Sidekiq::Worker
+end
+----
+
+==== Whitelist: ['AbstractWorker']
+
+[source,ruby]
+----
+# good
+module AbstractWorker
+  include Sidekiq::Worker
+end
+----
+
+== Sidekiq/InlinePerform
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for Sidekiq workers being instantiated and performed inline, rather than
+asynchronously.
+
+Test files are excluded from this cop, by default.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+MyWorker.new.perform
+
+# good
+MyWorker.perform_async
+MyWorker.perform_in(3.hours)
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| Exclude
+| `spec/**/*`, `test/**/*`
+| Array
+|===
+
+== Sidekiq/KeywordArguments
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for Sidekiq worker `perform` methods that use keyword args. Keyword args
+cannot be properly serialized to Redis and are thus not recommended. Use regular arguments
+instead.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+class MyWorker
+  include Sidekiq::Worker
+
+  def perform(id:, keyword_with_default: false, **other_kwargs)
+  end
+end
+
+# good
+class MyWorker
+  include Sidekiq::Worker
+
+  def perform(id, arg_with_default = false, *other_args)
+  end
+end
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| Severity
+| `warning`
+| String
+|===
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+
+== Sidekiq/NamedQueue
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks that sidekiq workers use queues that are predefined. Sidekiq states that
+having many queues is not recommended due to complexity and overburdening Redis. Furthermore,
+new queues may not be processed without being set up explicitly.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+class MyWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: 'high'
+end
+
+# good
+class MyWorker
+  include Sidekiq::Worker
+end
+
+class MyWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: 'low'
+end
+----
+
+==== AllowedNames: ['high', 'low', 'default']
+
+[source,ruby]
+----
+# bad
+class MyWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: 'critical'
+end
+
+# good
+class MyWorker
+  include Sidekiq::Worker
+end
+
+class MyWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: 'high'
+end
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| AllowedNames
+| `default`, `low`, `critical`
+| Array
+|===
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues
+
+== Sidekiq/QueueInTransaction
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for workers being queued within a transaction. Queueing should not occur
+within a transaction, because even if the transaction is rolled back, the job will still
+persist. Additionally, this may cause errors where a job is run for a given record, before
+the transaction is committed.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+ActiveRecord::Base.transaction do
+  record.save
+  MyWorker.perform_async(record.id)
+end
+
+# bad
+transaction do
+  record.save
+  MyWorker.perform_async(record.id)
+end
+
+# good
+ActiveRecord::Base.transaction.do
+  record.save
+end
+MyWorker.perform_async(record.id) if record.persisted?
+
+# good
+ActiveRecord::Base.transaction.do
+  Post.create(...)
+end
+
+class Post < ApplicationRecord
+  after_commit(on: :create) { MyWorker.perform_async(id) }
+end
+----
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/FAQ#why-am-i-seeing-a-lot-of-cant-find-modelname-with-id12345-errors-with-sidekiq
+
+== Sidekiq/Sleep
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| No
+| 0.5
+| -
+|===
+
+This cop checks for calls to `sleep` or `Kernel.sleep` within a Sidekiq worker. Rather than
+pausing sidekiq execution, it's better to schedule a job to occur later.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+class MyWorker
+  include Sidekiq::Worker
+
+  def perform
+    # do work
+    sleep(5.minutes)
+    # do more work
+  end
+end
+
+# good
+class MyWorker
+  include Sidekiq::Worker
+
+  def perform
+    # do work
+    AdditionalWorkWorker.perform_in(5.minutes)
+  end
+end
+----
+
+== Sidekiq/SymbolArgument
+
+|===
+| Enabled by default | Safe | Supports autocorrection | VersionAdded | VersionChanged
+
+| Enabled
+| Yes
+| Yes
+| 0.5
+| -
+|===
+
+This cop checks for symbols passed as arguments to a Sidekiq worker's perform method.
+Symbols cannot be properly serialized for Redis and should be avoided. Use strings instead.
+
+=== Examples
+
+[source,ruby]
+----
+# bad
+MyWorker.perform_async(:foo)
+
+# good
+MyWorker.perform_async('foo')
+----
+
+=== Configurable attributes
+
+|===
+| Name | Default value | Configurable values
+
+| Severity
+| `warning`
+| String
+|===
+
+=== References
+
+* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple

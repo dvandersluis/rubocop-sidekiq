@@ -7,18 +7,22 @@ Sidekiq/ActiveRecordArgument:
   VersionAdded: '0.5'
   # Look for uses within variables and methods that are passed to perform_*
   DetectLocalIdentifiers: false
+  Severity: warning
 
 Sidekiq/ConstArgument:
   Description: "Classes and objects are not valid parameters to a Sidekiq worker"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
+  Severity: warning
 
 Sidekiq/DateTimeArgument:
   Description: "Use strings or integers to represent dates/times, not objects"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
+  Severity: warning
+  AllowedMethods: []
 
 Sidekiq/IncludedInModule:
   Description: "Only include Sidekiq::Worker in classes"
@@ -38,6 +42,7 @@ Sidekiq/KeywordArguments:
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
+  Severity: warning
 
 Sidekiq/NamedQueue:
   Description: "Minimize the number of queues used for sidekiq"
@@ -49,6 +54,12 @@ Sidekiq/NamedQueue:
     - low
     - critical
 
+Sidekiq/QueueInTransaction:
+  Description: "Do not queue workers within a transaction"
+  StyleGuide: "https://github.com/mperham/sidekiq/wiki/FAQ#why-am-i-seeing-a-lot-of-cant-find-modelname-with-id12345-errors-with-sidekiq"
+  Enabled: true
+  VersionAdded: '0.5'
+
 Sidekiq/Sleep:
   Description: "Do not call sleep in a sidekiq worker, queue up a job for later instead"
   Enabled: true
@@ -59,4 +70,5 @@ Sidekiq/SymbolArgument:
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
+  Severity: warning
 

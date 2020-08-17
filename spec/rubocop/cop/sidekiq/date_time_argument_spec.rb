@@ -157,6 +157,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::DateTimeArgument do
         expect_no_offenses(<<~RUBY)
           MyWorker.perform(Time.foo)
           MyWorker.perform(Time.bar)
+          MyWorker.perform(Time.now.bar)
           MyWorker.perform(Time.now.to_s)
         RUBY
       end
