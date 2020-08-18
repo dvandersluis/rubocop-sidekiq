@@ -6,6 +6,7 @@ Dir[File.expand_path('shared_examples/**/*.rb', __dir__)].sort.each { |f| requir
 
 RSpec.configure do |config|
   config.include RuboCop::RSpec::ExpectOffense
+  config.include RuboCop::AST::Sexp, :include_ast
 
   config.expect_with(:rspec) do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
