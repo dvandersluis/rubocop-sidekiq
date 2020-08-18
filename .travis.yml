@@ -2,7 +2,8 @@
 os: linux
 language: ruby
 cache: bundler
-before_install: gem install bundler -v 2.1.4
+before_install:
+  - gem install bundler -v 2.1.4
 install:
   - bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
 script: bundle exec rspec
@@ -10,6 +11,9 @@ rvm:
   - 2.7
   - 2.6
   - 2.5
+gemfile:
+  - .travis/gemfiles/rubocop-0.80.1.gemfile
+  - .travis/gemfiles/rubocop-head.gemfile
 jobs:
   include:
     - stage: lint
