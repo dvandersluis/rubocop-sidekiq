@@ -45,7 +45,7 @@ MyWorker.perform_async(5)
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+* https://github.com/sidekiq/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
 
 == Sidekiq/ConstArgument
 
@@ -90,7 +90,7 @@ MyWorker.perform_async(MyClass::MY_CONSTANT)
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+* https://github.com/sidekiq/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
 
 == Sidekiq/DateTimeArgument
 
@@ -160,7 +160,7 @@ MyWorker.perform_async(Time.now.mday)
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+* https://github.com/sidekiq/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
 
 == Sidekiq/IncludedInModule
 
@@ -294,7 +294,7 @@ end
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+* https://github.com/sidekiq/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
 
 == Sidekiq/NamedQueue
 
@@ -366,7 +366,7 @@ end
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues
+* https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#queues
 
 == Sidekiq/QueueInTransaction
 
@@ -419,7 +419,7 @@ end
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/FAQ#why-am-i-seeing-a-lot-of-cant-find-modelname-with-id12345-errors-with-sidekiq
+* https://github.com/sidekiq/sidekiq/wiki/FAQ#why-am-i-seeing-a-lot-of-cant-find-modelname-with-id12345-errors-with-sidekiq
 
 == Sidekiq/Sleep
 
@@ -500,4 +500,4 @@ MyWorker.perform_async('foo')
 
 === References
 
-* https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
+* https://github.com/sidekiq/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple
