@@ -9,9 +9,9 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
   context 'module with sidekiq include' do
     it 'registers an offense' do
       expect_offense(<<~RUBY)
-        module TestWorker
-          include Sidekiq::Worker
-          ^^^^^^^^^^^^^^^^^^^^^^^ Do not include Sidekiq::Worker in a module.
+        module TestJob
+          include Sidekiq::Job
+          ^^^^^^^^^^^^^^^^^^^^^^^ Do not include Sidekiq::Job in a module.
         end
       RUBY
     end
@@ -20,9 +20,9 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
   context 'anonymous module with sidekiq include' do
     it 'registers an offense' do
       expect_offense(<<~RUBY)
-        TestWorker = Module.new do
-          include Sidekiq::Worker
-          ^^^^^^^^^^^^^^^^^^^^^^^ Do not include Sidekiq::Worker in a module.
+        TestJob = Module.new do
+          include Sidekiq::Job
+          ^^^^^^^^^^^^^^^^^^^^^^^ Do not include Sidekiq::Job in a module.
         end
       RUBY
     end
@@ -31,7 +31,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
   context 'module without sidekiq include' do
     it 'does not register an offense' do
       expect_no_offenses(<<~RUBY)
-        module TestWorker
+        module TestJob
         end
       RUBY
     end
@@ -40,7 +40,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
   context 'anonymous module without sidekiq include' do
     it 'does not register an offense' do
       expect_no_offenses(<<~RUBY)
-        TestWorker = Module.new do
+        TestJob = Module.new do
         end
       RUBY
     end
@@ -49,8 +49,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
   context 'class with sidekiq include' do
     it 'does not register an offense' do
       expect_no_offenses(<<~RUBY)
-        class TestWorker
-          include Sidekiq::Worker
+        class TestJob
+          include Sidekiq::Job
         end
       RUBY
     end
@@ -63,7 +63,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           module Sidekiqable
-            include Sidekiq::Worker
+            include Sidekiq::Job
           end
         RUBY
       end
@@ -73,7 +73,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           Sidekiqable = Module.new do
-            include Sidekiq::Worker
+            include Sidekiq::Job
           end
         RUBY
       end
@@ -83,8 +83,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::IncludedInModule do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           Module.new do
-            include Sidekiq::Worker
-            ^^^^^^^^^^^^^^^^^^^^^^^ Do not include Sidekiq::Worker in a module.
+            include Sidekiq::Job
+            ^^^^^^^^^^^^^^^^^^^^^^^ Do not include Sidekiq::Job in a module.
           end
         RUBY
       end

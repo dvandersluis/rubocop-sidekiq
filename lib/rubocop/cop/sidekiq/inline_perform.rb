@@ -1,20 +1,20 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks for Sidekiq workers being instantiated and performed inline, rather than
+      # This cop checks for Sidekiq jobs being instantiated and performed inline, rather than
       # asynchronously.
       #
       # Test files are excluded from this cop, by default.
       #
       # @example
       #   # bad
-      #   MyWorker.new.perform
+      #   MyJob.new.perform
       #
       #   # good
-      #   MyWorker.perform_async
-      #   MyWorker.perform_in(3.hours)
+      #   MyJob.perform_async
+      #   MyJob.perform_in(3.hours)
       class InlinePerform < RuboCop::Cop::Cop
-        MSG = 'Do not run a Sidekiq worker inline.'.freeze
+        MSG = 'Do not run a Sidekiq job inline.'.freeze
 
         def_node_matcher :inline_perform?, <<~PATTERN
           (send $_ :perform ...)

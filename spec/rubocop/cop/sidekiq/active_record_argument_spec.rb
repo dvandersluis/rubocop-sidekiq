@@ -10,7 +10,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     context 'Model.find' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.perform(Model.find(5))
+          MyJob.perform(Model.find(5))
                            ^^^^^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
         RUBY
       end
@@ -19,7 +19,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     context 'Model.all' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.perform(Model.all)
+          MyJob.perform(Model.all)
                            ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
         RUBY
       end
@@ -28,7 +28,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     context 'AR chain' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.perform(Model.where(foo: :bar).first)
+          MyJob.perform(Model.where(foo: :bar).first)
                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
         RUBY
       end
@@ -37,7 +37,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     context 'AR chain with non-disallowed method' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.perform(Model.my_scope.last(3))
+          MyJob.perform(Model.my_scope.last(3))
                            ^^^^^^^^^^^^^^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
         RUBY
       end
@@ -46,7 +46,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
     context 'AR method called as an instance method' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          MyWorker.perform(foo.find)
+          MyJob.perform(foo.find)
         RUBY
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             query.first
           end
 
-          MyWorker.perform(finder(Model.all))
+          MyJob.perform(finder(Model.all))
                                   ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
         RUBY
       end
@@ -71,7 +71,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             query.first
           end
 
-          MyWorker.perform(finder(Model.first.id))
+          MyJob.perform(finder(Model.first.id))
         RUBY
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             query.first
           end
 
-          MyWorker.perform(finder(query: Model.all))
+          MyJob.perform(finder(query: Model.all))
                                          ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
         RUBY
       end
@@ -96,7 +96,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             id.to_s
           end
 
-          MyWorker.perform(finder(id: Model.first.id))
+          MyJob.perform(finder(id: Model.first.id))
         RUBY
       end
     end
@@ -112,7 +112,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 return Model.last(5)
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -125,7 +125,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 Model.last(5)
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -142,7 +142,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 true
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -159,7 +159,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 Model.last(5)
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -173,7 +173,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 return foo
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -187,7 +187,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 foo
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -201,7 +201,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 foo.first
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -215,7 +215,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 return foo.first
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -228,7 +228,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 return Model.last(5), true
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -241,7 +241,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 return :a, :b
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
             RUBY
           end
         end
@@ -254,7 +254,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 model.id
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
             RUBY
           end
         end
@@ -268,7 +268,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 :found
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
             RUBY
           end
         end
@@ -280,7 +280,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 query.first
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -293,7 +293,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 query2
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -306,7 +306,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 query.first
               end
 
-              MyWorker.perform(finder)
+              MyJob.perform(finder)
                                ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -320,7 +320,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
               end
 
               def perform
-                MyWorker.perform(call)
+                MyJob.perform(call)
                                  ^^^^ ActiveRecord objects are not Sidekiq-serializable.
               end
             RUBY
@@ -335,7 +335,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
               end
 
               def perform
-                MyWorker.perform(self.call)
+                MyJob.perform(self.call)
                                  ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
               end
             RUBY
@@ -348,7 +348,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             finder = Model.last(5)
 
-            MyWorker.perform(finder)
+            MyJob.perform(finder)
                              ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -357,7 +357,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           it 'registers an offense' do
             expect_offense(<<~RUBY)
               finder = Model.where(name: 'test')
-              MyWorker.perform(finder.first)
+              MyJob.perform(finder.first)
                                ^^^^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -367,7 +367,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           it 'does not register an offense' do
             expect_no_offenses(<<~RUBY)
               finder = Model.where(name: 'test')
-              MyWorker.perform(finder.id)
+              MyJob.perform(finder.id)
             RUBY
           end
         end
@@ -376,7 +376,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           it 'does not register an offense' do
             expect_no_offenses(<<~RUBY)
               finder = Model.where(name: 'test')
-              MyWorker.perform(finder.first.id)
+              MyJob.perform(finder.first.id)
             RUBY
           end
         end
@@ -387,7 +387,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             @finder = Model.last(5)
 
-            MyWorker.perform(@finder)
+            MyJob.perform(@finder)
                              ^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -397,7 +397,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_offense(<<~RUBY)
               instance_variable_set(:@finder, Model.last(5))
 
-              MyWorker.perform(@finder)
+              MyJob.perform(@finder)
                                ^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -409,7 +409,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             @@finder = Model.last(5)
 
-            MyWorker.perform(@@finder)
+            MyJob.perform(@@finder)
                              ^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -419,7 +419,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_offense(<<~RUBY)
               class_variable_set(:@@finder, Model.last(5))
 
-              MyWorker.perform(@@finder)
+              MyJob.perform(@@finder)
                                ^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -431,7 +431,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             $finder = Model.last(5)
 
-            MyWorker.perform($finder)
+            MyJob.perform($finder)
                              ^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -442,7 +442,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             FINDER = Model.last(5)
 
-            MyWorker.perform(FINDER)
+            MyJob.perform(FINDER)
                              ^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -454,7 +454,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             arr = []
             arr += Model.last(5)
 
-            MyWorker.perform(arr)
+            MyJob.perform(arr)
                              ^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -465,7 +465,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             arr ||= Model.last(5)
 
-            MyWorker.perform(arr)
+            MyJob.perform(arr)
                              ^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -476,7 +476,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           expect_offense(<<~RUBY)
             arr &&= Model.last(5)
 
-            MyWorker.perform(arr)
+            MyJob.perform(arr)
                              ^^^ ActiveRecord objects are not Sidekiq-serializable.
           RUBY
         end
@@ -487,7 +487,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
           it 'does not register an offense' do
             expect_no_offenses(<<~RUBY)
               foo, bar = 1, 2
-              MyWorker.perform(bar)
+              MyJob.perform(bar)
             RUBY
           end
         end
@@ -497,7 +497,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_offense(<<~RUBY)
               foo, bar = Model.last(5), 12
 
-              MyWorker.perform(foo)
+              MyJob.perform(foo)
                                ^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -508,7 +508,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_no_offenses(<<~RUBY)
               foo, bar = Model.last(5), 12
 
-              MyWorker.perform(bar)
+              MyJob.perform(bar)
             RUBY
           end
         end
@@ -518,7 +518,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_offense(<<~RUBY)
               foo, *bar = Model.last(5)
 
-              MyWorker.perform(foo)
+              MyJob.perform(foo)
                                ^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -529,7 +529,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             expect_offense(<<~RUBY)
               foo, *bar = Model.last(5)
 
-              MyWorker.perform(bar)
+              MyJob.perform(bar)
                                ^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end
@@ -548,7 +548,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 false
               end
 
-              MyWorker.perform(my_method)
+              MyJob.perform(my_method)
             RUBY
           end
         end
@@ -558,7 +558,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
             <<~RUBY
               class Foo
                 def perform
-                  MyWorker.perform(my_method)
+                  MyJob.perform(my_method)
                                    ^^^^^^^^^ ActiveRecord objects are not Sidekiq-serializable.
                 end
 
@@ -585,7 +585,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
 
               def background
                 not_used = false
-                MyWorker.perform(not_used)
+                MyJob.perform(not_used)
               end
             RUBY
           end
@@ -606,7 +606,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 end
 
                 def perform
-                  MyWorker.perform(call)
+                  MyJob.perform(call)
                 end
               end
             RUBY
@@ -632,7 +632,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 end
 
                 def perform
-                  MyWorker.perform(call)
+                  MyJob.perform(call)
                 end
               end
             RUBY
@@ -654,7 +654,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
 
               class B < A
                 def perform
-                  MyWorker.perform(call)
+                  MyJob.perform(call)
                                    ^^^^ ActiveRecord objects are not Sidekiq-serializable.
                 end
               end
@@ -673,7 +673,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::ActiveRecordArgument do
                 [Model.first, Model.last]
               end
 
-              MyWorker.perform(call)
+              MyJob.perform(call)
                                ^^^^ ActiveRecord objects are not Sidekiq-serializable.
             RUBY
           end

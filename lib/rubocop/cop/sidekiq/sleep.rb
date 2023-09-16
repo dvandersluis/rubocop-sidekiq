@@ -1,13 +1,13 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks for calls to `sleep` or `Kernel.sleep` within a Sidekiq worker. Rather than
+      # This cop checks for calls to `sleep` or `Kernel.sleep` within a Sidekiq job. Rather than
       # pausing sidekiq execution, it's better to schedule a job to occur later.
       #
       # @example
       #   # bad
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #
       #     def perform
       #       # do work
@@ -17,18 +17,18 @@ module RuboCop
       #   end
       #
       #   # good
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #
       #     def perform
       #       # do work
-      #       AdditionalWorkWorker.perform_in(5.minutes)
+      #       AdditionalWorkJob.perform_in(5.minutes)
       #     end
       #   end
       class Sleep < ::RuboCop::Cop::Cop
         include Helpers
 
-        MSG = 'Do not call `sleep` inside a sidekiq worker, schedule a job instead.'.freeze
+        MSG = 'Do not call `sleep` inside a sidekiq job, schedule a job instead.'.freeze
 
         def_node_matcher :sleep?, <<~PATTERN
           (send {(const _ :Kernel) nil?} :sleep ...)
@@ -36,7 +36,7 @@ module RuboCop
 
         def on_send(node)
           return unless sleep?(node)
-          return unless in_sidekiq_worker?(node)
+          return unless in_sidekiq_job?(node)
 
           add_offense(node)
         end

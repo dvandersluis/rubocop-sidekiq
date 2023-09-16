@@ -2,7 +2,7 @@ module RuboCop
   module Cop
     module Sidekiq
       # This cop checks for date/time objects being passed as arguments to perform a Sidekiq
-      # worker. Dates, times, durations, and related classes cannot be serialized to Redis.
+      # job. Dates, times, durations, and related classes cannot be serialized to Redis.
       # Use an integer or string representation of the date/time instead.
       #
       # By default, this only allows `to_i` and `to_s` as valid, serializable methods for these
@@ -10,24 +10,24 @@ module RuboCop
       #
       # @example
       #   # bad
-      #   MyWorker.perform_async(Time.now)
-      #   MyWorker.perform_async(Date.today)
-      #   MyWorker.perform_async(DateTime.now)
-      #   MyWorker.perform_async(ActiveSupport::TimeWithZone.new)
-      #   MyWorker.perform_async(1.hour)
-      #   MyWorker.perform_async(1.hour.ago)
+      #   MyJob.perform_async(Time.now)
+      #   MyJob.perform_async(Date.today)
+      #   MyJob.perform_async(DateTime.now)
+      #   MyJob.perform_async(ActiveSupport::TimeWithZone.new)
+      #   MyJob.perform_async(1.hour)
+      #   MyJob.perform_async(1.hour.ago)
       #
       #   # good
-      #   MyWorker.perform_async(Time.now.to_i)
-      #   MyWorker.perform_async(Date.today.to_s)
+      #   MyJob.perform_async(Time.now.to_i)
+      #   MyJob.perform_async(Date.today.to_s)
       #
       # @example AllowedMethods: [] (default)
       #   # bad
-      #   MyWorker.perform_async(Time.now.mday)
+      #   MyJob.perform_async(Time.now.mday)
       #
       # @example AllowedMethods: ['mday']
       #   # good
-      #   MyWorker.perform_async(Time.now.mday)
+      #   MyJob.perform_async(Time.now.mday)
       #
       class DateTimeArgument < ::RuboCop::Cop::Cop
         DURATION_METHODS = %i(

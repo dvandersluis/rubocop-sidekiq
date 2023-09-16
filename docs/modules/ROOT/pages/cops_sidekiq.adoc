@@ -13,20 +13,20 @@
 |===
 
 This cop checks for ActiveRecord objects being passed as arguments to perform a Sidekiq
-worker. ActiveRecord objects cannot be properly serialized into Redis, and therefore
+job. ActiveRecord objects cannot be properly serialized into Redis, and therefore
 should not be used. Instead of passing in an instantiated ActiveRecord object, pass
-an ID and instantiate the AR object in the worker.
+an ID and instantiate the AR object in the job.
 
 === Examples
 
 [source,ruby]
 ----
 # bad
-MyWorker.perform_async(Post.find(5))
-MyWorker.perform_async(Post.last(3))
+MyJob.perform_async(Post.find(5))
+MyJob.perform_async(Post.last(3))
 
 # good
-MyWorker.perform_async(5)
+MyJob.perform_async(5)
 ----
 
 === Configurable attributes
@@ -59,7 +59,7 @@ MyWorker.perform_async(5)
 | -
 |===
 
-This cop checks for Sidekiq worker perform arguments that look like classes or modules.
+This cop checks for Sidekiq job perform arguments that look like classes or modules.
 These cannot be serialized for Redis, and should not be used with Sidekiq.
 
 Constants other than classes/modules are not flagged by this cop.
@@ -69,13 +69,13 @@ Constants other than classes/modules are not flagged by this cop.
 [source,ruby]
 ----
 # bad
-MyWorker.perform_async(MyClass)
-MyWorker.perform_async(MyModule)
-MyWorker.perform_async(Namespace::Class)
+MyJob.perform_async(MyClass)
+MyJob.perform_async(MyModule)
+MyJob.perform_async(Namespace::Class)
 
 # good
-MyWorker.perform_async(MY_CONSTANT)
-MyWorker.perform_async(MyClass::MY_CONSTANT)
+MyJob.perform_async(MY_CONSTANT)
+MyJob.perform_async(MyClass::MY_CONSTANT)
 ----
 
 === Configurable attributes
@@ -105,7 +105,7 @@ MyWorker.perform_async(MyClass::MY_CONSTANT)
 |===
 
 This cop checks for date/time objects being passed as arguments to perform a Sidekiq
-worker. Dates, times, durations, and related classes cannot be serialized to Redis.
+job. Dates, times, durations, and related classes cannot be serialized to Redis.
 Use an integer or string representation of the date/time instead.
 
 By default, this only allows `to_i` and `to_s` as valid, serializable methods for these
@@ -116,16 +116,16 @@ classes. Use `AllowedMethods` to specify other allowed methods.
 [source,ruby]
 ----
 # bad
-MyWorker.perform_async(Time.now)
-MyWorker.perform_async(Date.today)
-MyWorker.perform_async(DateTime.now)
-MyWorker.perform_async(ActiveSupport::TimeWithZone.new)
-MyWorker.perform_async(1.hour)
-MyWorker.perform_async(1.hour.ago)
+MyJob.perform_async(Time.now)
+MyJob.perform_async(Date.today)
+MyJob.perform_async(DateTime.now)
+MyJob.perform_async(ActiveSupport::TimeWithZone.new)
+MyJob.perform_async(1.hour)
+MyJob.perform_async(1.hour.ago)
 
 # good
-MyWorker.perform_async(Time.now.to_i)
-MyWorker.perform_async(Date.today.to_s)
+MyJob.perform_async(Time.now.to_i)
+MyJob.perform_async(Date.today.to_s)
 ----
 
 ==== AllowedMethods: [] (default)
@@ -133,7 +133,7 @@ MyWorker.perform_async(Date.today.to_s)
 [source,ruby]
 ----
 # bad
-MyWorker.perform_async(Time.now.mday)
+MyJob.perform_async(Time.now.mday)
 ----
 
 ==== AllowedMethods: ['mday']
@@ -141,7 +141,7 @@ MyWorker.perform_async(Time.now.mday)
 [source,ruby]
 ----
 # good
-MyWorker.perform_async(Time.now.mday)
+MyJob.perform_async(Time.now.mday)
 ----
 
 === Configurable attributes
@@ -174,11 +174,11 @@ MyWorker.perform_async(Time.now.mday)
 | -
 |===
 
-This cop checks for `include Sidekiq::Worker` in a module. Modules are not instantiable,
+This cop checks for `include Sidekiq::Job` in a module. Modules are not instantiable,
 which means that if a module is attempted to be queued, Sidekiq will error trying to
 run the job.
 
-Modules intended for use with Sidekiq worker inheritance can be allowed by adding
+Modules intended for use with Sidekiq job inheritance can be allowed by adding
 it to the Whitelist.
 
 === Examples
@@ -186,23 +186,23 @@ it to the Whitelist.
 [source,ruby]
 ----
 # bad
-module MyWorker
-  include Sidekiq::Worker
+module MyJob
+  include Sidekiq::Job
 end
 
 # good
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 end
 ----
 
-==== Whitelist: ['AbstractWorker']
+==== Whitelist: ['AbstractJob']
 
 [source,ruby]
 ----
 # good
-module AbstractWorker
-  include Sidekiq::Worker
+module AbstractJob
+  include Sidekiq::Job
 end
 ----
 
@@ -218,7 +218,7 @@ end
 | -
 |===
 
-This cop checks for Sidekiq workers being instantiated and performed inline, rather than
+This cop checks for Sidekiq jobs being instantiated and performed inline, rather than
 asynchronously.
 
 Test files are excluded from this cop, by default.
@@ -228,11 +228,11 @@ Test files are excluded from this cop, by default.
 [source,ruby]
 ----
 # bad
-MyWorker.new.perform
+MyJob.new.perform
 
 # good
-MyWorker.perform_async
-MyWorker.perform_in(3.hours)
+MyJob.perform_async
+MyJob.perform_in(3.hours)
 ----
 
 === Configurable attributes
@@ -257,7 +257,7 @@ MyWorker.perform_in(3.hours)
 | -
 |===
 
-This cop checks for Sidekiq worker `perform` methods that use keyword args. Keyword args
+This cop checks for Sidekiq job `perform` methods that use keyword args. Keyword args
 cannot be properly serialized to Redis and are thus not recommended. Use regular arguments
 instead.
 
@@ -266,16 +266,16 @@ instead.
 [source,ruby]
 ----
 # bad
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 
   def perform(id:, keyword_with_default: false, **other_kwargs)
   end
 end
 
 # good
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 
   def perform(id, arg_with_default = false, *other_args)
   end
@@ -308,7 +308,7 @@ end
 | -
 |===
 
-This cop checks that sidekiq workers use queues that are predefined. Sidekiq states that
+This cop checks that sidekiq jobs use queues that are predefined. Sidekiq states that
 having many queues is not recommended due to complexity and overburdening Redis. Furthermore,
 new queues may not be processed without being set up explicitly.
 
@@ -317,18 +317,18 @@ new queues may not be processed without being set up explicitly.
 [source,ruby]
 ----
 # bad
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
   sidekiq_options queue: 'high'
 end
 
 # good
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 end
 
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
   sidekiq_options queue: 'low'
 end
 ----
@@ -338,18 +338,18 @@ end
 [source,ruby]
 ----
 # bad
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
   sidekiq_options queue: 'critical'
 end
 
 # good
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 end
 
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
   sidekiq_options queue: 'high'
 end
 ----
@@ -380,7 +380,7 @@ end
 | -
 |===
 
-This cop checks for workers being queued within a transaction. Queueing should not occur
+This cop checks for jobs being queued within a transaction. Queueing should not occur
 within a transaction, because even if the transaction is rolled back, the job will still
 persist. Additionally, this may cause errors where a job is run for a given record, before
 the transaction is committed.
@@ -392,20 +392,20 @@ the transaction is committed.
 # bad
 ActiveRecord::Base.transaction do
   record.save
-  MyWorker.perform_async(record.id)
+  MyJob.perform_async(record.id)
 end
 
 # bad
 transaction do
   record.save
-  MyWorker.perform_async(record.id)
+  MyJob.perform_async(record.id)
 end
 
 # good
 ActiveRecord::Base.transaction.do
   record.save
 end
-MyWorker.perform_async(record.id) if record.persisted?
+MyJob.perform_async(record.id) if record.persisted?
 
 # good
 ActiveRecord::Base.transaction.do
@@ -413,7 +413,7 @@ ActiveRecord::Base.transaction.do
 end
 
 class Post < ApplicationRecord
-  after_commit(on: :create) { MyWorker.perform_async(id) }
+  after_commit(on: :create) { MyJob.perform_async(id) }
 end
 ----
 
@@ -433,7 +433,7 @@ end
 | -
 |===
 
-This cop checks for calls to `sleep` or `Kernel.sleep` within a Sidekiq worker. Rather than
+This cop checks for calls to `sleep` or `Kernel.sleep` within a Sidekiq job. Rather than
 pausing sidekiq execution, it's better to schedule a job to occur later.
 
 === Examples
@@ -441,8 +441,8 @@ pausing sidekiq execution, it's better to schedule a job to occur later.
 [source,ruby]
 ----
 # bad
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 
   def perform
     # do work
@@ -452,12 +452,12 @@ class MyWorker
 end
 
 # good
-class MyWorker
-  include Sidekiq::Worker
+class MyJob
+  include Sidekiq::Job
 
   def perform
     # do work
-    AdditionalWorkWorker.perform_in(5.minutes)
+    AdditionalWorkJob.perform_in(5.minutes)
   end
 end
 ----
@@ -474,7 +474,7 @@ end
 | -
 |===
 
-This cop checks for symbols passed as arguments to a Sidekiq worker's perform method.
+This cop checks for symbols passed as arguments to a Sidekiq job's perform method.
 Symbols cannot be properly serialized for Redis and should be avoided. Use strings instead.
 
 === Examples
@@ -482,10 +482,10 @@ Symbols cannot be properly serialized for Redis and should be avoided. Use strin
 [source,ruby]
 ----
 # bad
-MyWorker.perform_async(:foo)
+MyJob.perform_async(:foo)
 
 # good
-MyWorker.perform_async('foo')
+MyJob.perform_async('foo')
 ----
 
 === Configurable attributes

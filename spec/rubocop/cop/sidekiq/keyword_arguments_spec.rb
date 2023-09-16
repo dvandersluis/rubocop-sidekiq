@@ -1,13 +1,13 @@
 RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
   subject(:cop) { described_class.new }
 
-  context 'in a sidekiq worker' do
+  context 'in a sidekiq job' do
     context 'perform method' do
       context 'no parameters' do
         it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform
               end
@@ -19,8 +19,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'normal param' do
         it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(foo)
               end
@@ -32,8 +32,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'splat param' do
         it 'does not register an offense' do
           expect_no_offenses(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(*args)
               end
@@ -45,11 +45,11 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'kwarg' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(foo:)
-                          ^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                          ^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           RUBY
@@ -59,11 +59,11 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'kwarg with default' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(foo: :bar)
-                          ^^^^^^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                          ^^^^^^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           RUBY
@@ -73,11 +73,11 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'kwarg splat unnamed' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(**)
-                          ^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                          ^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           RUBY
@@ -87,11 +87,11 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'kwarg splat named' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(**kwargs)
-                          ^^^^^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                          ^^^^^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           RUBY
@@ -101,13 +101,13 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'multiple kwargs' do
         it 'registers multiple offenses' do
           expect_offense(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(foo:, bar: 7, **rest)
-                          ^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
-                                ^^^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
-                                        ^^^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                          ^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
+                                ^^^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
+                                        ^^^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           RUBY
@@ -117,12 +117,12 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       context 'mixed parameters' do
         it 'registers offenses only on kwargs' do
           expect_offense(<<~RUBY)
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(a, *b, c:, **d)
-                                 ^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
-                                     ^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                                 ^^ Keyword arguments are not allowed in a sidekiq job's perform method.
+                                     ^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           RUBY
@@ -133,8 +133,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
     context 'in another method' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          class TestWorker
-            include Sidekiq::Worker
+          class TestJob
+            include Sidekiq::Job
 
             def foo(a:)
             end
@@ -160,11 +160,11 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           class Foo
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
 
               def perform(foo:)
-                          ^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                          ^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
               end
             end
           end
@@ -176,8 +176,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           class Foo
-            class TestWorker
-              include Sidekiq::Worker
+            class TestJob
+              include Sidekiq::Job
             end
 
             def perform(foo:)
@@ -189,21 +189,21 @@ RSpec.describe RuboCop::Cop::Sidekiq::KeywordArguments do
   end
 
   context 'in a Class.new class' do
-    context 'that is a sidekiq worker' do
+    context 'that is a sidekiq job' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           Class.new do
-            include Sidekiq::Worker
+            include Sidekiq::Job
 
             def perform(**kwargs)
-                        ^^^^^^^^ Keyword arguments are not allowed in a sidekiq worker's perform method.
+                        ^^^^^^^^ Keyword arguments are not allowed in a sidekiq job's perform method.
             end
           end
         RUBY
       end
     end
 
-    context 'that is not a sidekiq worker' do
+    context 'that is not a sidekiq job' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           Class.new do

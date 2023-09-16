@@ -1,16 +1,16 @@
 RSpec.describe RuboCop::Cop::Sidekiq::Sleep do
   subject(:cop) { described_class.new }
 
-  context 'in a sidekiq worker' do
+  context 'in a sidekiq job' do
     context 'implicit sleep' do
       let(:source) do
         <<~RUBY
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             def wait
               sleep 5
-              ^^^^^^^ Do not call `sleep` inside a sidekiq worker, schedule a job instead.
+              ^^^^^^^ Do not call `sleep` inside a sidekiq job, schedule a job instead.
             end
 
             def perform
@@ -28,12 +28,12 @@ RSpec.describe RuboCop::Cop::Sidekiq::Sleep do
     context 'explicit sleep' do
       let(:source) do
         <<~RUBY
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             def wait
               Kernel.sleep 5
-              ^^^^^^^^^^^^^^ Do not call `sleep` inside a sidekiq worker, schedule a job instead.
+              ^^^^^^^^^^^^^^ Do not call `sleep` inside a sidekiq job, schedule a job instead.
             end
 
             def perform
@@ -49,7 +49,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::Sleep do
     end
   end
 
-  context 'outside a sidekiq worker' do
+  context 'outside a sidekiq job' do
     let(:source) do
       <<~RUBY
         class Class

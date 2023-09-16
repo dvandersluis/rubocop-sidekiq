@@ -1,7 +1,7 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks for workers being queued within a transaction. Queueing should not occur
+      # This cop checks for jobs being queued within a transaction. Queueing should not occur
       # within a transaction, because even if the transaction is rolled back, the job will still
       # persist. Additionally, this may cause errors where a job is run for a given record, before
       # the transaction is committed.
@@ -10,20 +10,20 @@ module RuboCop
       #   # bad
       #   ActiveRecord::Base.transaction do
       #     record.save
-      #     MyWorker.perform_async(record.id)
+      #     MyJob.perform_async(record.id)
       #   end
       #
       #   # bad
       #   transaction do
       #     record.save
-      #     MyWorker.perform_async(record.id)
+      #     MyJob.perform_async(record.id)
       #   end
       #
       #   # good
       #   ActiveRecord::Base.transaction.do
       #     record.save
       #   end
-      #   MyWorker.perform_async(record.id) if record.persisted?
+      #   MyJob.perform_async(record.id) if record.persisted?
       #
       #   # good
       #   ActiveRecord::Base.transaction.do
@@ -31,7 +31,7 @@ module RuboCop
       #   end
       #
       #   class Post < ApplicationRecord
-      #     after_commit(on: :create) { MyWorker.perform_async(id) }
+      #     after_commit(on: :create) { MyJob.perform_async(id) }
       #   end
       class QueueInTransaction < ::RuboCop::Cop::Cop
         include Helpers

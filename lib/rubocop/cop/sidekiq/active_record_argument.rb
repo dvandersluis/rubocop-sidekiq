@@ -4,17 +4,17 @@ module RuboCop
   module Cop
     module Sidekiq
       # This cop checks for ActiveRecord objects being passed as arguments to perform a Sidekiq
-      # worker. ActiveRecord objects cannot be properly serialized into Redis, and therefore
+      # job. ActiveRecord objects cannot be properly serialized into Redis, and therefore
       # should not be used. Instead of passing in an instantiated ActiveRecord object, pass
-      # an ID and instantiate the AR object in the worker.
+      # an ID and instantiate the AR object in the job.
       #
       # @example
       #   # bad
-      #   MyWorker.perform_async(Post.find(5))
-      #   MyWorker.perform_async(Post.last(3))
+      #   MyJob.perform_async(Post.find(5))
+      #   MyJob.perform_async(Post.last(3))
       #
       #   # good
-      #   MyWorker.perform_async(5)
+      #   MyJob.perform_async(5)
       class ActiveRecordArgument < ::RuboCop::Cop::Cop
         include Helpers
         include CheckAssignment

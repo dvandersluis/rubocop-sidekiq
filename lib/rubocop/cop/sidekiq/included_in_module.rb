@@ -1,33 +1,33 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks for `include Sidekiq::Worker` in a module. Modules are not instantiable,
+      # This cop checks for `include Sidekiq::Job` in a module. Modules are not instantiable,
       # which means that if a module is attempted to be queued, Sidekiq will error trying to
       # run the job.
       #
-      # Modules intended for use with Sidekiq worker inheritance can be allowed by adding
+      # Modules intended for use with Sidekiq job inheritance can be allowed by adding
       # it to the Whitelist.
       #
       # @example
       #   # bad
-      #   module MyWorker
-      #     include Sidekiq::Worker
+      #   module MyJob
+      #     include Sidekiq::Job
       #   end
       #
       #   # good
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #   end
       #
-      # @example Whitelist: ['AbstractWorker']
+      # @example Whitelist: ['AbstractJob']
       #  # good
-      #  module AbstractWorker
-      #    include Sidekiq::Worker
+      #  module AbstractJob
+      #    include Sidekiq::Job
       #  end
       class IncludedInModule < ::RuboCop::Cop::Cop
         include Helpers
 
-        MSG = 'Do not include Sidekiq::Worker in a module.'.freeze
+        MSG = 'Do not include Sidekiq::Job in a module.'.freeze
 
         def_node_matcher :module_include?, <<~PATTERN
           {

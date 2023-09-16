@@ -12,8 +12,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
     context 'queue named default' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             sidekiq_options queue: :default
           end
@@ -24,8 +24,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
     context 'queue named low' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             sidekiq_options queue: :low
           end
@@ -36,8 +36,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
     context 'queue named critical' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             sidekiq_options queue: :critical
           end
@@ -48,8 +48,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
     context 'queue named something else' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             sidekiq_options queue: :foobar
                                    ^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
@@ -60,8 +60,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
       context 'queue name is a string' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class MyWorker
-              include Sidekiq::Worker
+            class MyJob
+              include Sidekiq::Job
 
               sidekiq_options queue: 'foobar'
                                      ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
@@ -73,8 +73,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
       context 'queue key is a string' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class MyWorker
-              include Sidekiq::Worker
+            class MyJob
+              include Sidekiq::Job
 
               sidekiq_options 'queue' => :foobar
                                          ^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
@@ -86,8 +86,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
       context 'queue key and value are strings' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class MyWorker
-              include Sidekiq::Worker
+            class MyJob
+              include Sidekiq::Job
 
               sidekiq_options 'queue' => 'foobar'
                                          ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
@@ -99,8 +99,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
       context 'sidekiq_options has other keys' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class MyWorker
-              include Sidekiq::Worker
+            class MyJob
+              include Sidekiq::Job
 
               sidekiq_options queue: 'foobar', other: true
                                      ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
@@ -112,8 +112,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
       context 'sidekiq_options has other keys first' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
-            class MyWorker
-              include Sidekiq::Worker
+            class MyJob
+              include Sidekiq::Job
 
               sidekiq_options other: true, queue: 'foobar'
                                                   ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: default, low, critical.
@@ -130,8 +130,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
     context 'queue named default' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             sidekiq_options queue: :default
                                    ^^^^^^^^ Do not add new named queues to sidekiq, they will not be processed by default. Allowed queues: low.
@@ -143,8 +143,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::NamedQueue do
     context 'queue named low' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
-          class MyWorker
-            include Sidekiq::Worker
+          class MyJob
+            include Sidekiq::Job
 
             sidekiq_options queue: :low
           end

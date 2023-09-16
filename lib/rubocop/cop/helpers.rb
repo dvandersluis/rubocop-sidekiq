@@ -4,7 +4,7 @@ module RuboCop
       module Helpers
         NODE_MATCHERS = lambda do
           def_node_matcher :sidekiq_include?, <<~PATTERN
-            (send nil? :include (const (const nil? :Sidekiq) :Worker))
+            (send nil? :include (const (const nil? :Sidekiq) :Job))
           PATTERN
 
           def_node_matcher :includes_sidekiq?, <<~PATTERN
@@ -14,16 +14,16 @@ module RuboCop
             }
           PATTERN
 
-          def_node_matcher :worker_class_def?, <<~PATTERN
+          def_node_matcher :job_class_def?, <<~PATTERN
             (class _ _ #includes_sidekiq?)
           PATTERN
 
-          def_node_matcher :worker_anon_class_def?, <<~PATTERN
+          def_node_matcher :job_anon_class_def?, <<~PATTERN
             (block (send (const nil? :Class) :new ...) _ #includes_sidekiq?)
           PATTERN
 
-          def_node_matcher :sidekiq_worker?, <<~PATTERN
-            {#worker_class_def? #worker_anon_class_def?}
+          def_node_matcher :sidekiq_job?, <<~PATTERN
+            {#job_class_def? #job_anon_class_def?}
           PATTERN
 
           def_node_matcher :sidekiq_perform?, <<~PATTERN
@@ -35,8 +35,8 @@ module RuboCop
           klass.class_exec(&NODE_MATCHERS)
         end
 
-        def in_sidekiq_worker?(node)
-          node.each_ancestor(:class, :block).detect { |anc| sidekiq_worker?(anc) }
+        def in_sidekiq_job?(node)
+          node.each_ancestor(:class, :block).detect { |anc| sidekiq_job?(anc) }
         end
 
         def sidekiq_arguments(node)
