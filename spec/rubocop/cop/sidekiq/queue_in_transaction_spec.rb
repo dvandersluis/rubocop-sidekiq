@@ -6,7 +6,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::QueueInTransaction do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           ActiveRecord::Base.transaction do
-            MyWorker.perform
+            MyJob.perform
             ^^^^^^^^^^^^^^^^ Do not queue a job inside a transaction.
           end
         RUBY
@@ -17,7 +17,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::QueueInTransaction do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           Post.transaction do
-            MyWorker.perform
+            MyJob.perform
             ^^^^^^^^^^^^^^^^ Do not queue a job inside a transaction.
           end
         RUBY
@@ -28,7 +28,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::QueueInTransaction do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           transaction do
-            MyWorker.perform
+            MyJob.perform
             ^^^^^^^^^^^^^^^^ Do not queue a job inside a transaction.
           end
         RUBY
@@ -40,7 +40,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::QueueInTransaction do
         expect_offense(<<~RUBY)
           transaction do
             Post.do_something
-            MyWorker.perform
+            MyJob.perform
             ^^^^^^^^^^^^^^^^ Do not queue a job inside a transaction.
           end
         RUBY
@@ -54,7 +54,7 @@ RSpec.describe RuboCop::Cop::Sidekiq::QueueInTransaction do
             Post.do_something
           end
 
-          MyWorker.perform
+          MyJob.perform
         RUBY
       end
     end

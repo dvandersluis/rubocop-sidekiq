@@ -5,12 +5,12 @@ RSpec.describe RuboCop::Cop::Sidekiq::SymbolArgument do
     context 'with symbol argument' do
       it 'registers an offense and corrects' do
         expect_offense(<<~RUBY)
-          MyWorker.perform(:symbol)
+          MyJob.perform(:symbol)
                            ^^^^^^^ Symbols are not Sidekiq-serializable; use strings instead.
         RUBY
 
         expect_correction(<<~RUBY)
-          MyWorker.perform('symbol')
+          MyJob.perform('symbol')
         RUBY
       end
     end

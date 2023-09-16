@@ -1,7 +1,7 @@
 # This is the default configuration file.
 
 Sidekiq/ActiveRecordArgument:
-  Description: "ActiveRecord arguments are not valid parameters to a Sidekiq worker"
+  Description: "ActiveRecord arguments are not valid parameters to a Sidekiq job"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
@@ -10,7 +10,7 @@ Sidekiq/ActiveRecordArgument:
   Severity: warning
 
 Sidekiq/ConstArgument:
-  Description: "Classes and objects are not valid parameters to a Sidekiq worker"
+  Description: "Classes and objects are not valid parameters to a Sidekiq job"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
@@ -25,12 +25,12 @@ Sidekiq/DateTimeArgument:
   AllowedMethods: []
 
 Sidekiq/IncludedInModule:
-  Description: "Only include Sidekiq::Worker in classes"
+  Description: "Only include Sidekiq::Job in classes"
   Enabled: true
   VersionAdded: '0.5'
 
 Sidekiq/InlinePerform:
-  Description: "Do not instantiate and perform Sidekiq workers directly"
+  Description: "Do not instantiate and perform Sidekiq jobs directly"
   Enabled: true
   VersionAdded: '0.5'
   Exclude:
@@ -38,7 +38,7 @@ Sidekiq/InlinePerform:
     - 'test/**/*'
 
 Sidekiq/KeywordArguments:
-  Description: "Do not use keyword arguments in a sidekiq worker's perform method"
+  Description: "Do not use keyword arguments in a sidekiq job's perform method"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'
@@ -55,18 +55,18 @@ Sidekiq/NamedQueue:
     - critical
 
 Sidekiq/QueueInTransaction:
-  Description: "Do not queue workers within a transaction"
+  Description: "Do not queue jobs within a transaction"
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/FAQ#why-am-i-seeing-a-lot-of-cant-find-modelname-with-id12345-errors-with-sidekiq"
   Enabled: true
   VersionAdded: '0.5'
 
 Sidekiq/Sleep:
-  Description: "Do not call sleep in a sidekiq worker, queue up a job for later instead"
+  Description: "Do not call sleep in a sidekiq job, queue up a job for later instead"
   Enabled: true
   VersionAdded: '0.5'
 
 Sidekiq/SymbolArgument:
-  Description: 'Use strings instead of symbols as parameters to a worker'
+  Description: 'Use strings instead of symbols as parameters to a job'
   StyleGuide: "https://github.com/mperham/sidekiq/wiki/Best-Practices#1-make-your-job-parameters-small-and-simple"
   Enabled: true
   VersionAdded: '0.5'

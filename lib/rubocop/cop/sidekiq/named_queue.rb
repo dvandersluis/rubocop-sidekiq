@@ -1,41 +1,41 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks that sidekiq workers use queues that are predefined. Sidekiq states that
+      # This cop checks that sidekiq jobs use queues that are predefined. Sidekiq states that
       # having many queues is not recommended due to complexity and overburdening Redis. Furthermore,
       # new queues may not be processed without being set up explicitly.
       #
       # @example
       #   # bad
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #     sidekiq_options queue: 'high'
       #   end
       #
       #   # good
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #   end
       #
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #     sidekiq_options queue: 'low'
       #   end
       #
       # @example AllowedNames: ['high', 'low', 'default']
       #   # bad
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #     sidekiq_options queue: 'critical'
       #   end
       #
       #   # good
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #   end
       #
-      #   class MyWorker
-      #     include Sidekiq::Worker
+      #   class MyJob
+      #     include Sidekiq::Job
       #     sidekiq_options queue: 'high'
       #   end
       class NamedQueue < ::RuboCop::Cop::Cop
@@ -49,7 +49,7 @@ module RuboCop
 
         def on_send(node)
           return unless (queue_name = named_queue?(node))
-          return unless in_sidekiq_worker?(node)
+          return unless in_sidekiq_job?(node)
           return if name_allowed?(queue_name)
 
           add_offense(queue_name, message: MSG % allowed_names.join(', '))

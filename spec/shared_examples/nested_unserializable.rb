@@ -4,12 +4,12 @@ RSpec.shared_examples 'nested unserializable' do |argument, msg, correction: nil
   context 'symbol in array' do
     it test_statement do
       expect_offense(<<~RUBY)
-        MyWorker.perform([#{argument}])
+        MyJob.perform([#{argument}])
                           #{'^' * argument.length} #{msg}
       RUBY
 
       expect_correction(<<~RUBY) if correction
-        MyWorker.perform([#{correction}])
+        MyJob.perform([#{correction}])
       RUBY
     end
   end
@@ -17,12 +17,12 @@ RSpec.shared_examples 'nested unserializable' do |argument, msg, correction: nil
   context 'symbol in nested array' do
     it test_statement do
       expect_offense(<<~RUBY)
-        MyWorker.perform([[#{argument}]])
+        MyJob.perform([[#{argument}]])
                            #{'^' * argument.length} #{msg}
       RUBY
 
       expect_correction(<<~RUBY) if correction
-        MyWorker.perform([[#{correction}]])
+        MyJob.perform([[#{correction}]])
       RUBY
     end
   end
@@ -30,12 +30,12 @@ RSpec.shared_examples 'nested unserializable' do |argument, msg, correction: nil
   context 'symbol in hash' do
     it test_statement do
       expect_offense(<<~RUBY)
-        MyWorker.perform(name: #{argument})
+        MyJob.perform(name: #{argument})
                                #{'^' * argument.length} #{msg}
       RUBY
 
       expect_correction(<<~RUBY) if correction
-        MyWorker.perform(name: #{correction})
+        MyJob.perform(name: #{correction})
       RUBY
     end
   end
@@ -43,12 +43,12 @@ RSpec.shared_examples 'nested unserializable' do |argument, msg, correction: nil
   context 'symbol in nested hash' do
     it test_statement do
       expect_offense(<<~RUBY)
-        MyWorker.perform(data: { name: #{argument} })
+        MyJob.perform(data: { name: #{argument} })
                                        #{'^' * argument.length} #{msg}
       RUBY
 
       expect_correction(<<~RUBY) if correction
-        MyWorker.perform(data: { name: #{correction} })
+        MyJob.perform(data: { name: #{correction} })
       RUBY
     end
   end
@@ -56,13 +56,13 @@ RSpec.shared_examples 'nested unserializable' do |argument, msg, correction: nil
   context 'symbol in nested mess' do
     it test_statement do
       expect_offense(<<~RUBY)
-        MyWorker.perform(data: [{ name: #{argument}, type: #{argument} }])
+        MyJob.perform(data: [{ name: #{argument}, type: #{argument} }])
                                         #{'^' * argument.length} #{msg}
                                         #{' ' * argument.length}        #{'^' * argument.length} #{msg}
       RUBY
 
       expect_correction(<<~RUBY) if correction
-        MyWorker.perform(data: [{ name: #{correction}, type: #{correction} }])
+        MyJob.perform(data: [{ name: #{correction}, type: #{correction} }])
       RUBY
     end
   end

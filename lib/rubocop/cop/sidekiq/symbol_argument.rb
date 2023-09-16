@@ -1,15 +1,15 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks for symbols passed as arguments to a Sidekiq worker's perform method.
+      # This cop checks for symbols passed as arguments to a Sidekiq job's perform method.
       # Symbols cannot be properly serialized for Redis and should be avoided. Use strings instead.
       #
       # @example
       #   # bad
-      #   MyWorker.perform_async(:foo)
+      #   MyJob.perform_async(:foo)
       #
       #   # good
-      #   MyWorker.perform_async('foo')
+      #   MyJob.perform_async('foo')
       class SymbolArgument < ::RuboCop::Cop::Cop
         include Helpers
 

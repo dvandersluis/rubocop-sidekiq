@@ -5,8 +5,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::InlinePerform do
     context 'with arguments' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.new.perform('foo')
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not run a Sidekiq worker inline.
+          MyJob.new.perform('foo')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not run a Sidekiq job inline.
         RUBY
       end
     end
@@ -14,8 +14,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::InlinePerform do
     context 'without arguments' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          MyWorker.new.perform
-          ^^^^^^^^^^^^^^^^^^^^ Do not run a Sidekiq worker inline.
+          MyJob.new.perform
+          ^^^^^^^^^^^^^^^^^^^^ Do not run a Sidekiq job inline.
         RUBY
       end
     end
@@ -25,8 +25,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::InlinePerform do
     context 'with arguments' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          my_worker.perform('foo')
-          ^^^^^^^^^^^^^^^^^^^^^^^^ Do not run a Sidekiq worker inline.
+          my_job.perform('foo')
+          ^^^^^^^^^^^^^^^^^^^^^ Do not run a Sidekiq job inline.
         RUBY
       end
     end
@@ -34,8 +34,8 @@ RSpec.describe RuboCop::Cop::Sidekiq::InlinePerform do
     context 'without arguments' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
-          my_worker.perform
-          ^^^^^^^^^^^^^^^^^ Do not run a Sidekiq worker inline.
+          my_job.perform
+          ^^^^^^^^^^^^^^ Do not run a Sidekiq job inline.
         RUBY
       end
     end

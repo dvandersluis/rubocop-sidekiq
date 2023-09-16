@@ -1,20 +1,20 @@
 module RuboCop
   module Cop
     module Sidekiq
-      # This cop checks for Sidekiq worker perform arguments that look like classes or modules.
+      # This cop checks for Sidekiq job perform arguments that look like classes or modules.
       # These cannot be serialized for Redis, and should not be used with Sidekiq.
       #
       # Constants other than classes/modules are not flagged by this cop.
       #
       # @example
       #   # bad
-      #   MyWorker.perform_async(MyClass)
-      #   MyWorker.perform_async(MyModule)
-      #   MyWorker.perform_async(Namespace::Class)
+      #   MyJob.perform_async(MyClass)
+      #   MyJob.perform_async(MyModule)
+      #   MyJob.perform_async(Namespace::Class)
       #
       #   # good
-      #   MyWorker.perform_async(MY_CONSTANT)
-      #   MyWorker.perform_async(MyClass::MY_CONSTANT)
+      #   MyJob.perform_async(MY_CONSTANT)
+      #   MyJob.perform_async(MyClass::MY_CONSTANT)
       class ConstArgument < ::RuboCop::Cop::Cop
         CONSTANT_NAME = /\A[A-Z0-9_]+\z/.freeze
 
